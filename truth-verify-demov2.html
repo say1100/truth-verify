@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truth 志愿核验</title>
+<style>
+  :root{
+    /* Palette — kept blue as required */
+    --blue-900:#0f2a5e;
+    --blue-800:#12327a;
+    --blue-700:#1a44b8;
+    --blue-600:#2450e6;   /* primary */
+    --blue-500:#3b6bf0;
+    --blue-400:#5b86f5;
+    --blue-100:#e4ecfe;
+    --blue-50:#eef3fe;
+    --ink:#13233f;
+    --ink-2:#3d4b63;
+    --ink-3:#6b7891;
+    --line:#d9e2f5;
+    --line-soft:#e8eefb;
+    --bg:#f4f7fe;
+    --bg-2:#eaf1fd;
+    --white:#ffffff;
+    --amber-bg:#fff6e0;
+    --amber-line:#f2d888;
+    --amber-ink:#9a6b12;
+    --green-bg:#e6f6ec;
+    --green-line:#bfe6cc;
+    --green-ink:#1f8a4c;
+    --radius:16px;
+    --radius-sm:10px;
+    --shadow-sm:0 1px 2px rgba(18,50,122,.05);
+    --shadow:0 6px 24px rgba(18,50,122,.08);
+    --shadow-lg:0 14px 44px rgba(18,50,122,.12);
+    --font:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font);
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 100% -10%, #e9f0ff 0%, transparent 55%),
+      radial-gradient(900px 500px at -10% 110%, #eaf1fd 0%, transparent 50%),
+      var(--bg);
+    background-attachment:fixed;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  ::selection{background:var(--blue-100);color:var(--blue-800)}
+
+  /* ---------- Layout ---------- */
+  .wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+  .page{display:none;animation:fade .4s ease}
+  .page.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .section-pad{padding:36px 0 72px}
+
+  /* ---------- Nav ---------- */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.82);
+    backdrop-filter:saturate(160%) blur(14px);
+    border-bottom:1px solid var(--line-soft);
+  }
+  .nav-inner{display:flex;align-items:center;height:68px;gap:8px}
+  .brand{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none;margin-right:8px;
+    border:0;background:transparent;font-family:inherit;padding:0}
+  .brand .logo{
+    width:34px;height:34px;border-radius:11px;
+    background:linear-gradient(145deg,var(--blue-600),var(--blue-800));
+    display:grid;place-items:center;color:#fff;box-shadow:0 4px 12px rgba(36,80,230,.35);
+  }
+  .brand .logo svg{width:18px;height:18px}
+  .brand b{font-size:19px;font-weight:800;letter-spacing:.2px;color:var(--ink)}
+  .brand b span{color:var(--blue-600)}
+  .nav-links{display:flex;gap:4px;margin-left:18px}
+  .nav-link{
+    position:relative;padding:9px 15px;border-radius:10px;
+    font-size:15px;font-weight:600;color:var(--ink-2);cursor:pointer;
+    transition:.18s;border:none;background:none;font-family:inherit;
+  }
+  .nav-link:hover{color:var(--blue-700);background:var(--blue-50)}
+  .nav-link.active{color:var(--blue-700)}
+  .nav-link.active::after{
+    content:"";position:absolute;left:15px;right:15px;bottom:-1px;height:3px;
+    border-radius:3px;background:linear-gradient(90deg,var(--blue-600),var(--blue-400));
+  }
+  .nav-spacer{flex:1}
+  .btn-ghost{
+    padding:9px 16px;border-radius:10px;border:1.5px solid var(--line);
+    background:#fff;color:var(--ink-2);font-size:14px;font-weight:600;cursor:pointer;
+    font-family:inherit;transition:.18s;
+  }
+  .btn-ghost:hover{border-color:var(--blue-400);color:var(--blue-700)}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 22px;border-radius:12px;font-size:15px;font-weight:700;
+    cursor:pointer;font-family:inherit;border:1.5px solid transparent;transition:.2s;
+    white-space:nowrap;
+  }
+  .btn-primary{
+    color:#fff;border:none;
+    background:linear-gradient(145deg,var(--blue-600),var(--blue-700));
+    box-shadow:0 8px 20px rgba(36,80,230,.28);
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(36,80,230,.36)}
+  .btn-primary:active{transform:translateY(0)}
+  .btn-outline{background:#fff;border:1.5px solid var(--line);color:var(--ink-2)}
+  .btn-outline:hover{border-color:var(--blue-400);color:var(--blue-700);background:var(--blue-50)}
+
+  /* ---------- Generic cards ---------- */
+  .card{
+    background:var(--white);border:1px solid var(--line-soft);
+    border-radius:var(--radius);box-shadow:var(--shadow-sm);
+  }
+  .icon-badge{
+    width:30px;height:30px;border-radius:9px;flex:none;
+    background:linear-gradient(145deg,var(--blue-600),var(--blue-800));
+    display:grid;place-items:center;color:#fff;box-shadow:0 3px 9px rgba(36,80,230,.3);
+  }
+  .icon-badge svg{width:16px;height:16px}
+  .card-title{display:flex;align-items:center;gap:11px;font-size:17px;font-weight:800;color:var(--ink)}
+  .breadcrumb{font-size:13px;color:var(--ink-3);margin-bottom:10px;font-weight:600}
+  .h1{font-size:40px;font-weight:900;letter-spacing:-.5px;color:var(--ink);line-height:1.15}
+  .sub{font-size:16px;color:var(--ink-2);margin-top:12px}
+
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:999px;
+    font-size:13px;font-weight:600;background:var(--blue-50);color:var(--blue-700);
+    border:1px solid var(--line-soft);
+  }
+  .tag-amber{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber-ink);
+    padding:5px 12px;border-radius:8px;font-size:13px;font-weight:700}
+  .tag-green{display:inline-flex;align-items:center;gap:5px;background:var(--green-bg);border:1px solid var(--green-line);
+    color:var(--green-ink);padding:5px 11px;border-radius:8px;font-size:13px;font-weight:700}
+
+  /* =================================================================
+     PAGE 1 — LANDING
+     ================================================================= */
+  .hero{
+    display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;
+    min-height:calc(100vh - 68px);padding:40px 0;
+  }
+  .hero-left{max-width:520px}
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 15px;border-radius:999px;
+    background:var(--blue-50);border:1px solid var(--line-soft);color:var(--blue-700);
+    font-size:13px;font-weight:700;margin-bottom:24px}
+  .hero-eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--blue-600);
+    box-shadow:0 0 0 4px rgba(36,80,230,.15)}
+  .hero-title{font-size:56px;font-weight:900;letter-spacing:-1px;line-height:1.08;
+    background:linear-gradient(120deg,var(--blue-800),var(--blue-600) 55%,var(--blue-500));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-desc{font-size:17px;color:var(--ink-2);margin:22px 0 30px;line-height:1.7}
+  .hero-cta{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:min(100%,560px)}
+  .hero-cta .btn{width:100%;justify-content:center}
+  .hero-cardnav{width:min(100%,560px);height:60px;margin-top:38px;border:1px solid var(--line-soft);
+    border-radius:14px;background:#fff;box-shadow:var(--shadow);overflow:hidden;position:relative;
+    transition:height .42s cubic-bezier(.22,1,.36,1)}
+  .hero-cardnav.open{height:250px}
+  .hero-cardnav-top{position:absolute;top:0;left:0;right:0;height:60px;z-index:2;display:flex;
+    align-items:center;justify-content:space-between;padding:8px 8px 8px 18px;background:#fff}
+  .hero-cardnav-menu{width:42px;height:42px;border:0;background:transparent;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:6px;cursor:pointer;color:var(--ink)}
+  .hero-cardnav-menu span{width:26px;height:2px;border-radius:999px;background:currentColor;
+    transition:transform .25s ease,opacity .2s ease}
+  .hero-cardnav-menu.open span:first-child{transform:translateY(4px) rotate(45deg)}
+  .hero-cardnav-menu.open span:last-child{transform:translateY(-4px) rotate(-45deg)}
+  .hero-cardnav-logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    font-size:14px;font-weight:900;color:var(--blue-800);letter-spacing:.02em;white-space:nowrap}
+  .hero-cardnav-content{position:absolute;left:0;right:0;top:60px;bottom:0;display:grid;
+    grid-template-columns:repeat(3,1fr);gap:10px;padding:8px;opacity:0;pointer-events:none;
+    transform:translateY(28px);transition:opacity .3s ease .08s,transform .38s cubic-bezier(.22,1,.36,1) .04s}
+  .hero-cardnav.open .hero-cardnav-content{opacity:1;pointer-events:auto;transform:translateY(0)}
+  .hero-nav-card{min-width:0;border-radius:11px;padding:14px 14px 12px;display:flex;flex-direction:column;
+    gap:8px;color:#fff;overflow:hidden;position:relative}
+  .hero-nav-card::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 45%);
+    pointer-events:none}
+  .hero-nav-card-a{background:linear-gradient(145deg,var(--blue-700),var(--blue-500))}
+  .hero-nav-card-b{background:linear-gradient(145deg,#18315f,#315ca6)}
+  .hero-nav-card-c{background:linear-gradient(145deg,#113f4f,#1e7a8d)}
+  .hero-nav-label{font-size:22px;font-weight:900;letter-spacing:0;line-height:1.15;position:relative;z-index:1}
+  .hero-nav-links{margin-top:auto;display:flex;flex-direction:column;gap:4px;position:relative;z-index:1}
+  .hero-nav-links button{border:0;background:transparent;color:inherit;text-align:left;padding:0;font-size:13px;
+    font-weight:700;line-height:1.35;cursor:pointer;opacity:.9}
+  .hero-nav-links button:hover{opacity:1;text-decoration:underline;text-underline-offset:3px}
+
+  .hero-right{position:relative}
+  .mind{
+    position:relative;border-radius:24px;padding:34px;min-height:520px;
+    background:linear-gradient(160deg,#f2f7ff,#e7effe);
+    border:1px solid var(--line-soft);box-shadow:var(--shadow-lg);overflow:hidden;
+  }
+  .mind::before{content:"";position:absolute;inset:0;
+    background-image:radial-gradient(rgba(36,80,230,.09) 1px,transparent 1px);
+    background-size:22px 22px;opacity:.6}
+  .mind-title{position:relative;text-align:center;font-size:20px;font-weight:800;
+    color:var(--ink);margin-bottom:26px}
+  .mm{position:relative;height:400px}
+  .node{
+    position:absolute;background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:11px 15px;font-size:13px;font-weight:700;color:var(--ink);
+    box-shadow:var(--shadow-sm);white-space:nowrap;animation:float 5s ease-in-out infinite;
+  }
+  .node small{display:block;font-size:11px;color:var(--ink-3);font-weight:600;margin-top:2px}
+  .node.center{left:50%;top:50%;transform:translate(-50%,-50%);
+    background:linear-gradient(145deg,var(--blue-600),var(--blue-800));color:#fff;
+    padding:15px 22px;font-size:15px;box-shadow:0 10px 24px rgba(36,80,230,.35);animation:none;z-index:3}
+  .node.n1{left:2%;top:6%;animation-delay:.1s}
+  .node.n2{right:2%;top:2%;animation-delay:.6s}
+  .node.n3{left:0;bottom:20%;animation-delay:1.1s}
+  .node.n4{right:0;bottom:8%;animation-delay:1.6s}
+  .node.n5{left:50%;top:2%;transform:translateX(-50%);animation-delay:.9s}
+  .node.n6{left:50%;bottom:0;transform:translateX(-50%);animation-delay:1.3s}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  .node.n5{animation-name:floatx}.node.n6{animation-name:floatx}
+  @keyframes floatx{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-7px)}}
+  svg.links{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+  svg.links path{stroke:var(--blue-400);stroke-width:1.6;fill:none;opacity:.55;stroke-dasharray:4 5}
+
+  /* =================================================================
+     PAGE 2 — VERIFY INPUT
+     ================================================================= */
+  .verify-grid{display:grid;grid-template-columns:1fr 340px;gap:26px;margin-top:30px;align-items:start}
+  .field-label{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:12px;display:block}
+  textarea.claim{
+    width:100%;min-height:150px;resize:vertical;padding:18px 18px;border-radius:14px;
+    border:1.5px solid var(--line);background:var(--bg);font-family:inherit;font-size:16px;
+    color:var(--ink);line-height:1.7;transition:.2s;
+  }
+  textarea.claim:focus{outline:none;border-color:var(--blue-400);background:#fff;
+    box-shadow:0 0 0 4px rgba(36,80,230,.1)}
+  .char-count{text-align:right;font-size:13px;color:var(--ink-3);margin-top:8px;font-weight:600}
+  .recognized{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .controls-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:26px}
+  .ctrl label{display:block;font-size:14px;font-weight:700;color:var(--ink-2);margin-bottom:8px}
+  .ctrl select{
+    width:100%;padding:12px 14px;border-radius:11px;border:1.5px solid var(--line);
+    background:#fff;font-family:inherit;font-size:15px;color:var(--ink);cursor:pointer;
+    appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7891' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;transition:.2s;
+  }
+  .ctrl select:focus{outline:none;border-color:var(--blue-400);box-shadow:0 0 0 3px rgba(36,80,230,.1)}
+  .action-row{display:flex;gap:14px;margin-top:28px}
+  .side-list{list-style:none}
+  .side-list li{display:flex;align-items:flex-start;gap:11px;padding:9px 0;font-size:15px;
+    color:var(--ink-2);font-weight:600}
+  .side-list li svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--green-ink)}
+  .privacy{font-size:14px;color:var(--ink-2);line-height:1.7;margin-top:6px}
+
+  /* =================================================================
+     PAGE 3 — RESULT
+     ================================================================= */
+  .quote-box{
+    display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;padding:22px 24px;
+  }
+  .quote-box .q{font-size:20px;font-weight:800;color:var(--ink);line-height:1.5;flex:1;min-width:260px}
+  .quote-box .q .mark{color:var(--blue-400);font-size:26px;font-weight:900}
+  .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}
+  .score-card{display:flex;align-items:center;gap:26px;padding:26px 28px}
+  .score-num{font-size:64px;font-weight:900;line-height:1;
+    background:linear-gradient(150deg,var(--blue-600),var(--blue-800));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .score-ring{position:relative;width:96px;height:96px;flex:none}
+  .score-ring svg{transform:rotate(-90deg)}
+  .score-ring .val{position:absolute;inset:0;display:grid;place-items:center;
+    font-size:28px;font-weight:900;color:var(--blue-700)}
+  .conclusion h4{font-size:17px;font-weight:800;margin-bottom:6px}
+  .conclusion p{font-size:15px;color:var(--ink-2);line-height:1.6}
+  .evidence-item,.model-item{
+    display:flex;align-items:center;gap:14px;padding:15px 18px;border:1px solid var(--line-soft);
+    border-radius:12px;margin-top:12px;background:var(--bg);transition:.18s;
+  }
+  .evidence-item:hover,.model-item:hover{border-color:var(--blue-100);background:#fff}
+  .evidence-item .name{font-weight:800;font-size:15px;flex:1}
+  .evidence-meta{display:block;font-size:12px;color:var(--ink-3);font-weight:600;margin-top:3px}
+  .link-view{font-size:13px;font-weight:700;color:var(--blue-600);cursor:pointer;white-space:nowrap}
+  .link-view:hover{text-decoration:underline}
+  .model-item .mname{font-weight:800;font-size:15px;width:110px;flex:none}
+  .model-item .mverdict{font-weight:800;font-size:14px;color:var(--blue-700);width:74px;flex:none}
+  .model-item .mdesc{font-size:13.5px;color:var(--ink-2);line-height:1.5}
+  .conflict-line{display:flex;align-items:center;gap:9px;font-size:15px;color:var(--ink-2);
+    padding:9px 0;font-weight:600}
+  .conflict-line .dot{width:6px;height:6px;border-radius:50%;background:var(--blue-400);flex:none}
+  .result-actions{display:flex;gap:14px;justify-content:center;margin-top:30px}
+
+  /* =================================================================
+     PAGE 4 — SCHOOL COMPARE
+     ================================================================= */
+  .school-picker{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:16px}
+  .school-pill{
+    padding:20px 42px 20px 42px;border:1.5px solid var(--line);border-radius:14px;background:#fff;
+    font-size:18px;font-weight:800;color:var(--ink);min-width:180px;text-align:center;
+    box-shadow:var(--shadow-sm);position:relative;transition:.18s;
+  }
+  .school-pill:hover{border-color:var(--blue-400)}
+  .school-pill .x{position:absolute;top:8px;right:10px;width:24px;height:24px;border:0;background:transparent;
+    color:var(--ink-3);font-size:16px;line-height:1;cursor:pointer;border-radius:6px}
+  .school-pill .x:hover{background:var(--blue-50);color:var(--blue-700)}
+  .school-pill .school-fav{
+    position:absolute;top:8px;left:10px;width:24px;height:24px;border:0;background:transparent;
+    color:var(--blue-600);font-family:inherit;font-size:17px;line-height:1;cursor:pointer;border-radius:6px
+  }
+  .school-pill .school-fav:hover{background:var(--blue-50);color:var(--blue-700)}
+  .school-add{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line);
+    border-radius:14px;background:#fff;box-shadow:var(--shadow-sm)}
+  .school-add input{width:220px;border:0;background:transparent;padding:8px 6px;font-family:inherit;
+    font-size:14px;color:var(--ink)}
+  .school-add input:focus{outline:none}
+  .cmp-tabs{display:flex;gap:6px;margin-top:26px;border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+  .cmp-tab{padding:11px 18px;font-size:15px;font-weight:700;color:var(--ink-3);cursor:pointer;background:transparent;
+    appearance:none;border:0;font-family:inherit;
+    border-bottom:2.5px solid transparent;margin-bottom:-1px;transition:.18s}
+  .cmp-tab:hover{color:var(--blue-700)}
+  .cmp-tab.active{color:var(--blue-700);border-color:var(--blue-600)}
+  .cmp-layout{display:grid;grid-template-columns:1fr 300px;gap:24px;margin-top:22px;align-items:start}
+  table.cmp{width:100%;border-collapse:collapse}
+  table.cmp th,table.cmp td{text-align:left;padding:16px 18px;font-size:15px;border-bottom:1px solid var(--line-soft)}
+  table.cmp thead th{font-size:14px;font-weight:800;color:var(--ink);background:var(--bg)}
+  table.cmp tbody th{font-weight:700;color:var(--ink-2);width:130px}
+  table.cmp td{color:var(--ink-2)}
+  table.cmp tr:last-child th,table.cmp tr:last-child td{border-bottom:none}
+  .quick-item{padding:16px 18px;border:1px solid var(--line-soft);border-radius:12px;margin-top:12px;
+    font-weight:800;font-size:15px;color:var(--ink);text-align:center;background:var(--bg)}
+  .fit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:8px}
+  .fit-grid p{font-size:14.5px;color:var(--ink-2);line-height:1.7}
+  .fit-grid b{color:var(--blue-700)}
+  .major-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
+  .major-search{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line);
+    border-radius:14px;background:#fff;box-shadow:var(--shadow-sm)}
+  .major-search input{width:220px;border:0;background:transparent;padding:8px 6px;font-family:inherit;
+    font-size:14px;color:var(--ink)}
+  .major-search input:focus{outline:none}
+
+  /* =================================================================
+     PAGE 5 — MAJOR
+     ================================================================= */
+  .major-hero{display:grid;grid-template-columns:200px 1fr;gap:26px;padding:28px;align-items:center}
+  .major-icon{width:200px;height:180px;border-radius:16px;
+    background:linear-gradient(150deg,#e8f0ff,#dbe7fe);display:grid;place-items:center;
+    color:var(--blue-600);border:1px solid var(--line-soft)}
+  .major-icon svg{width:70px;height:70px}
+  .major-hero h2{font-size:34px;font-weight:900;letter-spacing:-.5px}
+  .major-hero p{font-size:15.5px;color:var(--ink-2);margin:12px 0 20px;line-height:1.7;max-width:560px}
+  .major-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
+  .meta-card{padding:16px;border:1px solid var(--line-soft);border-radius:12px;background:var(--bg);
+    font-size:14px;font-weight:700;color:var(--ink-2);line-height:1.5;text-align:center}
+  .meta-card b{display:block;color:var(--blue-700);font-size:13px;margin-bottom:4px}
+  .major-body{display:grid;grid-template-columns:1fr 380px;gap:24px;margin-top:24px;align-items:start}
+  .learn-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .learn-card{padding:16px;border:1px solid var(--line-soft);border-radius:12px;background:var(--bg);transition:.18s}
+  .learn-card:hover{border-color:var(--blue-100);background:#fff}
+  .learn-card b{font-size:15px;font-weight:800}
+  .learn-card small{display:block;font-size:13px;color:var(--ink-3);margin-top:6px;line-height:1.5}
+  .career-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px}
+  .career-card{padding:18px 14px;border:1px solid var(--line-soft);border-radius:12px;text-align:center;
+    font-weight:800;font-size:15px;color:var(--ink);background:var(--bg);transition:.18s}
+  .career-card:hover{border-color:var(--blue-400);color:var(--blue-700)}
+  .claim-check{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:15px 18px;border:1px solid var(--line-soft);border-radius:12px;margin-top:12px;background:var(--bg)}
+  .claim-check b{font-size:15px;font-weight:800}
+  .ask-item{display:flex;align-items:center;gap:11px;padding:10px 0;font-size:15px;color:var(--ink-2);font-weight:600}
+  .ask-box{width:18px;height:18px;border:1.5px solid var(--line);border-radius:5px;flex:none}
+
+  /* =================================================================
+     PAGE 6 — PROFILE
+     ================================================================= */
+  .profile-top{display:grid;grid-template-columns:1fr auto;gap:26px;align-items:center;padding:26px 30px}
+  .profile-id{display:flex;align-items:center;gap:18px}
+  .profile-star{width:56px;height:56px;border-radius:16px;
+    background:linear-gradient(145deg,var(--blue-600),var(--blue-800));display:grid;place-items:center;
+    color:#fff;box-shadow:0 8px 20px rgba(36,80,230,.32)}
+  .profile-star svg{width:26px;height:26px}
+  .profile-id h2{font-size:30px;font-weight:900}
+  .profile-id p{font-size:14.5px;color:var(--ink-2);margin-top:4px}
+  .stat-row{display:flex;gap:14px}
+  .stat-card{padding:16px 26px;border:1px solid var(--line-soft);border-radius:14px;text-align:center;
+    background:var(--bg);min-width:104px}
+  .stat-card .lab{font-size:13.5px;font-weight:700;color:var(--ink-2)}
+  .stat-card .num{font-size:26px;font-weight:900;color:var(--blue-700);margin-top:3px}
+  .profile-body{display:grid;grid-template-columns:1fr 340px;gap:24px;margin-top:24px;align-items:start}
+  .search-saved{width:100%;padding:12px 16px;border:1.5px solid var(--line);border-radius:11px;
+    font-family:inherit;font-size:15px;background:var(--bg);margin-bottom:6px}
+  .search-saved:focus{outline:none;border-color:var(--blue-400);background:#fff}
+  .report-item{display:grid;grid-template-columns:1fr auto auto auto;gap:16px;align-items:center;
+    padding:18px 20px;border:1px solid var(--line-soft);border-radius:13px;margin-top:14px;
+    background:var(--bg);transition:.18s}
+  .report-item:hover{border-color:var(--blue-100);background:#fff;box-shadow:var(--shadow-sm)}
+  .report-item .rtitle{font-size:16px;font-weight:800;color:var(--ink)}
+  .report-item .rmeta{font-size:13px;color:var(--ink-3);margin-top:5px;font-weight:600}
+  .report-item .rscore{text-align:center}
+  .report-item .rscore small{display:block;font-size:12px;color:var(--blue-600);font-weight:700}
+  .report-item .rscore b{font-size:22px;font-weight:900;color:var(--blue-700)}
+  .fav-link{display:flex;align-items:center;gap:10px;width:100%;padding:11px 4px;font-size:15px;font-weight:700;
+    color:var(--blue-700);cursor:pointer;border-radius:8px;transition:.15s}
+  button.fav-link{border:0;background:transparent;font-family:inherit;text-align:left}
+  .fav-link:hover{background:var(--blue-50);padding-left:10px}
+  .fav-link svg{width:17px;height:17px;color:var(--blue-500)}
+  .fav-count{color:var(--ink-3);font-weight:700}
+  .update-item{display:flex;align-items:center;justify-content:space-between;width:100%;padding:11px 0;
+    font-size:14.5px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft)}
+  button.update-item{border:0;background:transparent;font-family:inherit;text-align:left;cursor:pointer}
+  button.update-item:hover span:first-child{color:var(--blue-700)}
+  .update-item:last-child{border:none}
+  .update-item .date{color:var(--blue-600);font-weight:700;font-size:13px}
+  .favorite-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 20px}
+  .favorite-tab{padding:10px 14px;border:1px solid var(--line);border-radius:11px;background:#fff;
+    font-family:inherit;font-weight:800;color:var(--ink-2);cursor:pointer}
+  .favorite-tab.active{background:var(--blue-600);border-color:var(--blue-600);color:#fff}
+  .favorite-list{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .favorite-card{position:relative;padding:18px 48px 18px 18px;border:1px solid var(--line-soft);border-radius:13px;background:var(--bg)}
+  .favorite-card h3{font-size:17px;font-weight:900;margin-bottom:6px}
+  .favorite-card p{font-size:14px;color:var(--ink-2);line-height:1.6;margin-bottom:14px}
+  .favorite-actions{display:flex;gap:10px;flex-wrap:wrap}
+  .favorite-remove{position:absolute;top:12px;right:12px;width:28px;height:28px;border:0;border-radius:8px;
+    background:transparent;color:var(--ink-3);font-size:18px;line-height:1;cursor:pointer}
+  .favorite-remove:hover{background:var(--blue-50);color:var(--blue-700)}
+  .favorite-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;
+    background:rgba(15,23,42,.24);z-index:60}
+  .favorite-modal.active{display:flex}
+  .favorite-dialog{width:min(460px,100%);background:#fff;border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 24px 70px rgba(15,23,42,.18);padding:22px}
+  .favorite-dialog h3{font-size:20px;font-weight:900;margin-bottom:6px}
+  .favorite-dialog p{font-size:14px;color:var(--ink-2);line-height:1.6;margin-bottom:16px}
+  .favorite-choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .favorite-choice{padding:13px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);
+    font-family:inherit;font-weight:850;cursor:pointer;text-align:left}
+  .favorite-choice small{display:block;margin-top:4px;color:var(--ink-3);font-weight:650;line-height:1.35}
+  .favorite-choice:hover{border-color:var(--blue-400);background:var(--blue-50);color:var(--blue-700)}
+  .favorite-toast{position:fixed;right:24px;bottom:24px;z-index:80;padding:12px 16px;border-radius:12px;
+    background:var(--ink);color:#fff;font-size:14px;font-weight:800;box-shadow:var(--shadow-md);display:none}
+  .favorite-toast.active{display:block}
+  .school-detail-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;margin-top:22px;align-items:start}
+  .detail-kv{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:16px}
+  .detail-kv .meta-card{text-align:left}
+  .detail-list{display:grid;gap:12px;margin-top:14px}
+  .detail-line{padding:14px 16px;border:1px solid var(--line-soft);border-radius:12px;background:var(--bg);font-weight:700;color:var(--ink-2)}
+
+  /* responsive */
+  @media(max-width:980px){
+    .hero,.verify-grid,.result-grid,.cmp-layout,.major-hero,.major-body,.profile-top,.profile-body{grid-template-columns:1fr}
+    .hero-right{display:none}
+    .nav-links{display:none}
+    .h1,.hero-title{font-size:34px}
+    .controls-row,.major-meta,.career-grid,.fit-grid,.favorite-list,.school-detail-grid,.detail-kv{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <button class="brand" type="button" onclick="go('landing')">
+      <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+      <b>Truth <span>志愿核验</span></b>
+    </button>
+    <div class="nav-links" id="navLinks">
+      <button class="nav-link" data-page="verify" onclick="go('verify')">验证说法</button>
+      <button class="nav-link" data-page="compare" onclick="go('compare')">学校对比</button>
+      <button class="nav-link" data-page="major" onclick="go('major')">专业查询</button>
+      <button class="nav-link" data-page="profile" onclick="go('profile')">个人中心</button>
+    </div>
+    <div class="nav-spacer"></div>
+    <button class="btn-ghost" onclick="go('result')">查看示例</button>
+  </div>
+</nav>
+
+<!-- ================= PAGE 1 : LANDING ================= -->
+<section id="landing" class="page active">
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-left">
+        <span class="hero-eyebrow"><span class="dot"></span>多模型交叉校验 · 官方优先</span>
+        <h1 class="hero-title">志愿核验台</h1>
+        <p class="hero-desc">验证网上、群聊、短视频和学长学姐的说法，优先查官方，多来源交叉校验，帮你在报志愿时看清每一条信息是否可信。</p>
+        <div class="hero-cta">
+          <button class="btn btn-primary" onclick="go('verify')">
+            进入工作台
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <button class="btn btn-outline" onclick="go('result')">看一份示例报告</button>
+        </div>
+        <div class="hero-cardnav" id="heroCardNav">
+          <div class="hero-cardnav-top">
+            <button class="hero-cardnav-menu" type="button" aria-label="展开核验能力" aria-expanded="false" onclick="toggleHeroCardNav()">
+              <span></span>
+              <span></span>
+            </button>
+            <div class="hero-cardnav-logo">核验能力</div>
+          </div>
+          <div class="hero-cardnav-content" aria-hidden="true">
+            <article class="hero-nav-card hero-nav-card-a">
+              <div class="hero-nav-label">4</div>
+              <div class="hero-nav-links">
+                <button type="button" onclick="go('verify')">独立核验模型 ↗</button>
+                <button type="button" onclick="go('compare')">官方 / 就业 / 校园 / 风险 ↗</button>
+              </div>
+            </article>
+            <article class="hero-nav-card hero-nav-card-b">
+              <div class="hero-nav-label">官方优先</div>
+              <div class="hero-nav-links">
+                <button type="button" onclick="go('verify')">资料查证 ↗</button>
+                <button type="button" onclick="go('major')">先看章程与公开报告 ↗</button>
+              </div>
+            </article>
+            <article class="hero-nav-card hero-nav-card-c">
+              <div class="hero-nav-label">可追溯</div>
+              <div class="hero-nav-links">
+                <button type="button" onclick="go('result')">每条结论有出处 ↗</button>
+                <button type="button" onclick="go('profile')">保留证据与分歧点 ↗</button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="mind">
+          <div class="mind-title">多模型核验思维导图</div>
+          <div class="mm">
+            <svg class="links" viewBox="0 0 480 400" preserveAspectRatio="none">
+              <path d="M240 200 C 150 140, 90 90, 70 70"/>
+              <path d="M240 200 C 330 130, 400 70, 420 55"/>
+              <path d="M240 200 C 130 240, 70 300, 45 320"/>
+              <path d="M240 200 C 350 250, 420 320, 445 360"/>
+              <path d="M240 200 C 240 130, 240 70, 240 45"/>
+              <path d="M240 200 C 240 280, 240 350, 240 390"/>
+            </svg>
+            <div class="node center">一条说法</div>
+            <div class="node n1">官方核验模型<small>资料查证</small></div>
+            <div class="node n2">就业分析模型<small>数据评估</small></div>
+            <div class="node n3">校园体验模型<small>宿舍 · 校区</small></div>
+            <div class="node n4">风险识别模型<small>夸大检测</small></div>
+            <div class="node n5">冲突与时效<small>版本差异</small></div>
+            <div class="node n6">可追溯报告<small>Truth Score</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAGE 2 : VERIFY INPUT ================= -->
+<section id="verify" class="page">
+  <div class="wrap section-pad">
+    <div class="breadcrumb">验证说法</div>
+    <h1 class="h1">验证一条志愿说法</h1>
+    <p class="sub">把你在网上、群聊、短视频或学长学姐那里听到的说法粘贴进来。</p>
+
+    <div class="verify-grid">
+      <div class="card" style="padding:28px">
+        <label class="field-label">非官方说法</label>
+        <textarea class="claim" id="claimInput" maxlength="500" oninput="updCount()">某大学转专业很容易，宿舍也不错，就业基本不用担心。</textarea>
+        <div class="char-count"><span id="cc">26</span> / 500</div>
+
+        <label class="field-label" style="margin-top:24px">已识别的信息</label>
+        <div class="recognized" id="recognizedInfo">
+          <span class="chip">学校：某大学</span>
+          <span class="chip">话题：转专业</span>
+          <span class="chip">话题：宿舍</span>
+          <span class="chip">话题：就业</span>
+        </div>
+
+        <div class="controls-row">
+          <div class="ctrl">
+            <label>目标省份</label>
+            <select id="verifyProvince">
+              <option>广东</option><option>北京</option><option>天津</option><option>河北</option><option>山西</option><option>内蒙古</option>
+              <option>辽宁</option><option>吉林</option><option>黑龙江</option><option>上海</option><option>江苏</option><option>浙江</option>
+              <option>安徽</option><option>福建</option><option>江西</option><option>山东</option><option>河南</option><option>湖北</option>
+              <option>湖南</option><option>广西</option><option>海南</option><option>重庆</option><option>四川</option><option>贵州</option>
+              <option>云南</option><option>西藏</option><option>陕西</option><option>甘肃</option><option>青海</option><option>宁夏</option>
+              <option>新疆</option>
+            </select>
+          </div>
+          <div class="ctrl">
+            <label>考生科类</label>
+            <select id="verifySubject"><option>物理类</option><option>历史类</option></select>
+          </div>
+          <div class="ctrl">
+            <label>核验深度</label>
+            <select id="verifyDepth"><option>完整报告</option><option>快速核验</option></select>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn btn-primary" onclick="runVerify()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            开始核验
+          </button>
+          <button class="btn btn-outline" onclick="clearClaim()">清空内容</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="padding:24px">
+          <div class="card-title" style="margin-bottom:16px">
+            <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span>
+            核验将包含
+          </div>
+          <ul class="side-list">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>官方资料查证</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>多来源交叉验证</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>多模型独立判断</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>冲突与过时检测</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>生成可追溯报告</li>
+          </ul>
+        </div>
+
+        <div class="card" style="padding:24px;margin-top:18px">
+          <div class="card-title" style="margin-bottom:12px">
+            <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+            隐私提示
+          </div>
+          <p class="privacy">请勿填写身份证号、准考证号等敏感信息。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAGE 3 : RESULT ================= -->
+<section id="result" class="page">
+  <div class="wrap section-pad">
+    <div class="breadcrumb">验证说法</div>
+    <h1 class="h1">这条说法靠谱吗？</h1>
+
+    <div class="card" style="margin-top:22px">
+      <div class="quote-box">
+        <div class="q"><span class="mark">“</span><span id="resultClaim">某大学转专业很容易，宿舍也不错，就业基本不用担心。</span><span class="mark">”</span></div>
+        <div id="resultClaimTags" style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="chip">转专业</span><span class="chip">宿舍</span><span class="chip">就业</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-grid">
+      <!-- score -->
+      <div class="card score-card">
+        <div class="score-ring">
+          <svg width="96" height="96">
+            <circle cx="48" cy="48" r="42" stroke="#e4ecfe" stroke-width="9" fill="none"/>
+            <circle id="resultScoreArc" cx="48" cy="48" r="42" stroke="url(#g)" stroke-width="9" fill="none"
+              stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="47"/>
+            <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#2450e6"/><stop offset="1" stop-color="#12327a"/>
+            </linearGradient></defs>
+          </svg>
+          <div class="val" id="resultScore">82</div>
+        </div>
+        <div class="conclusion">
+          <h4 id="resultVerdict">综合结论</h4>
+          <p id="resultSummary">部分可信，但存在夸大表达，建议重点确认转专业条件与具体校区。</p>
+        </div>
+      </div>
+
+      <!-- risk -->
+      <div class="card" style="padding:24px">
+        <div class="card-title" style="margin-bottom:16px">
+          <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+          风险提示
+        </div>
+        <div id="resultRiskTags" style="display:flex;gap:12px;flex-wrap:wrap">
+          <span class="tag-amber">片面表达</span>
+          <span class="tag-amber">需确认校区</span>
+          <span class="tag-amber">就业结论过宽</span>
+        </div>
+      </div>
+
+      <!-- official evidence -->
+      <div class="card" style="padding:24px">
+        <div class="card-title" style="margin-bottom:8px">
+          <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+          官方依据
+        </div>
+        <div id="resultEvidence">
+          <div class="evidence-item"><span class="name">本科生转专业管理办法</span><span class="tag-green"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>已核验</span><span class="link-view">查看原文 ›</span></div>
+          <div class="evidence-item"><span class="name">2025 年招生章程</span><span class="tag-green"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>已核验</span><span class="link-view">查看原文 ›</span></div>
+          <div class="evidence-item"><span class="name">2024 届就业质量报告</span><span class="tag-green"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>已核验</span><span class="link-view">查看原文 ›</span></div>
+        </div>
+      </div>
+
+      <!-- models -->
+      <div class="card" style="padding:24px">
+        <div class="card-title" style="margin-bottom:8px">
+          <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
+          多模型对比结论
+        </div>
+        <div id="resultModels">
+          <div class="model-item"><span class="mname">官方核验模型</span><span class="mverdict">部分支持</span><span class="mdesc">材料支持"可转专业"，但有条件限制。</span></div>
+          <div class="model-item"><span class="mname">就业分析模型</span><span class="mverdict">谨慎采信</span><span class="mdesc">就业质量整体良好，但受专业与校区影响。</span></div>
+          <div class="model-item"><span class="mname">校园体验模型</span><span class="mverdict">可参考</span><span class="mdesc">宿舍体验较好，存在校区差异。</span></div>
+          <div class="model-item"><span class="mname">风险识别模型</span><span class="mverdict">发现夸大</span><span class="mdesc">"很容易""不用担心"属于夸大表达。</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- conflict -->
+    <div class="card" style="padding:24px;margin-top:22px">
+      <div class="card-title" style="margin-bottom:10px">
+        <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+        信息冲突、局限与追问
+      </div>
+      <div id="resultConflicts">
+        <div class="conflict-line"><span class="dot"></span>不同学院转专业名额与考核条件不同｜存在差异｜需具体确认。</div>
+        <div class="conflict-line"><span class="dot"></span>宿舍信息可能对应旧校区｜需确认｜建议核实校区信息。</div>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn btn-primary" onclick="go('verify')">继续追问</button>
+      <button class="btn btn-outline" onclick="go('compare')">对比学校</button>
+      <button class="btn btn-outline" onclick="go('profile')">保存报告</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAGE 4 : SCHOOL COMPARE ================= -->
+<section id="compare" class="page">
+  <div class="wrap section-pad">
+    <div class="breadcrumb">学校对比</div>
+    <h1 class="h1">对比你的候选学校</h1>
+    <p class="sub">从录取位次到校园生活，用同一套标准看清差异。</p>
+
+    <div class="card" style="padding:24px;margin-top:22px">
+      <div class="card-title" style="margin-bottom:6px">
+        <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+        已选学校（<span id="schoolCount">3</span> / 4）
+      </div>
+      <div class="school-picker" id="schoolPicker">
+        <div class="school-add" id="schoolAddBox">
+          <input id="schoolInput" placeholder="输入大学名称，如 华南师范大学" onkeydown="if(event.key==='Enter')addSchool()">
+          <button class="btn btn-primary" type="button" onclick="addSchool()">添加学校</button>
+        </div>
+        <button class="btn btn-primary" type="button" onclick="startCompare()">开始对比</button>
+      </div>
+    </div>
+
+    <div class="cmp-tabs">
+      <button class="cmp-tab active" type="button" onclick="cmpTab(this)">综合概览</button>
+      <button class="cmp-tab" type="button" onclick="cmpTab(this)">录取位次</button>
+      <button class="cmp-tab" type="button" onclick="cmpTab(this)">专业实力</button>
+      <button class="cmp-tab" type="button" onclick="cmpTab(this)">就业升学</button>
+      <button class="cmp-tab" type="button" onclick="cmpTab(this)">校园环境</button>
+      <button class="cmp-tab" type="button" onclick="cmpTab(this)">转专业政策</button>
+    </div>
+
+    <div class="cmp-layout">
+      <div class="card" style="padding:8px 0;overflow:hidden">
+        <table class="cmp" id="compareTable">
+          <thead id="compareHead"><tr><th>对比维度</th><th>南方理工大学</th><th>滨海科技大学</th><th>江城大学</th></tr></thead>
+          <tbody id="compareBody">
+            <tr><th>2025 录取位次</th><td>全省 3,200 名左右</td><td>全省 5,000 名左右</td><td>全省 7,800 名左右</td></tr>
+            <tr><th>优势专业</th><td>计算机、电子信息</td><td>人工智能、软件工程</td><td>法学、汉语言文学</td></tr>
+            <tr><th>升学率</th><td>28% 较高</td><td>24% 中等</td><td>18% 中等偏低</td></tr>
+            <tr><th>城市机会</th><td>广州 机会丰富</td><td>深圳 科技产业集中</td><td>武汉 机会中等</td></tr>
+            <tr><th>住宿条件</th><td>四人间，上床下桌</td><td>四人间，独卫空调</td><td>六人间，公共卫浴</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="padding:24px">
+        <div class="card-title" style="margin-bottom:8px">
+          <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 13 9 20 9"/><path d="M13 2l7 7v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg></span>
+          快速结论
+        </div>
+        <div class="quick-item">冲稳保定位清晰</div>
+        <div class="quick-item">城市机会差异较大</div>
+        <div class="quick-item">宿舍需确认具体校区</div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:26px;margin-top:22px">
+      <div class="card-title" style="margin-bottom:16px">
+        <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+        适合与风险
+      </div>
+      <div class="fit-grid" id="fitGrid">
+        <p><b>南方理工大学：</b>更适合看重升学与一线城市机会的同学。</p>
+        <p><b>滨海科技大学：</b>更适合关注科技企业发展与实习机会的同学。</p>
+        <p><b>江城大学：</b>更适合关注人文社科方向、注重性价比的同学。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAGE 5 : MAJOR ================= -->
+<section id="major" class="page">
+  <div class="wrap section-pad">
+    <div class="major-head">
+      <div class="breadcrumb" style="margin:0">专业查询</div>
+      <div class="major-search">
+        <input id="majorSearchInput" placeholder="输入专业名称，如 法学" onkeydown="if(event.key==='Enter')searchMajor()">
+        <button class="btn btn-primary" type="button" onclick="searchMajor()">查询专业</button>
+      </div>
+    </div>
+
+    <div class="card major-hero">
+      <div class="major-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="7" y="7" width="10" height="10" rx="2"/>
+          <path d="M9.5 12l1.8-1.8M9.5 12l1.8 1.8M14.5 10.2L12.8 12l1.7 1.8"/>
+          <path d="M4 9h3M4 15h3M17 9h3M17 15h3M9 4v3M15 4v3M9 17v3M15 17v3"/>
+        </svg>
+      </div>
+      <div>
+        <h2 id="majorTitle">计算机科学与技术</h2>
+        <p id="majorDesc">学习计算机系统、软件与算法的基础理论和工程方法，方向差异较大，应结合学校培养方案判断。</p>
+        <div style="display:flex;gap:14px">
+          <button class="btn btn-outline" onclick="saveCurrentMajor()">收藏专业</button>
+          <button class="btn btn-outline" onclick="compareRelatedMajors()">对比相近专业</button>
+          <button class="btn btn-primary" onclick="verifyCurrentMajorClaim()">验证专业说法</button>
+        </div>
+        <div class="major-meta">
+          <div class="meta-card"><b>能力要求</b>数学、逻辑、持续学习</div>
+          <div class="meta-card"><b>常见方向</b>开发、算法、系统</div>
+          <div class="meta-card"><b>信息来源</b>培养方案与公开报告</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="major-body">
+      <div>
+        <div class="card" style="padding:24px">
+          <div class="card-title">
+            <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+            学什么
+          </div>
+          <div class="learn-grid">
+            <div class="learn-card"><b>基础课程</b><small>课程、实验、训练与毕业设计</small></div>
+            <div class="learn-card"><b>核心课程</b><small>课程、实验、训练与毕业设计</small></div>
+            <div class="learn-card"><b>方向选修</b><small>课程、实验、训练与毕业设计</small></div>
+            <div class="learn-card"><b>实践项目</b><small>课程、实验、训练与毕业设计</small></div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:24px;margin-top:22px">
+          <div class="card-title">
+            <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>
+            就业与升学
+          </div>
+          <div class="career-grid">
+            <div class="career-card">软件开发</div>
+            <div class="career-card">算法与数据</div>
+            <div class="career-card">系统与安全</div>
+            <div class="career-card">读研深造</div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:8px 0;margin-top:22px;overflow:hidden">
+          <table class="cmp">
+            <thead><tr><th>项目</th><th>计算机科学与技术</th><th>软件工程</th><th>数据科学</th></tr></thead>
+            <tbody>
+              <tr><th>学习重点</th><td>系统与算法基础</td><td>工程实践</td><td>数据处理</td></tr>
+              <tr><th>实践强度</th><td>中等偏高</td><td>较高</td><td>较高</td></tr>
+              <tr><th>数学要求</th><td>较高</td><td>中等</td><td>较高</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="padding:24px">
+          <div class="card-title" style="margin-bottom:8px">
+            <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
+            常见说法核验
+          </div>
+          <div class="claim-check"><b>学计算机一定好就业？</b><span class="tag-amber">表达过宽</span></div>
+          <div class="claim-check"><b>不考研就没有出路？</b><span class="tag-amber">缺少依据</span></div>
+          <div class="claim-check"><b>数学不好不能学？</b><span class="tag-amber">部分片面</span></div>
+        </div>
+
+        <div class="card" style="padding:24px;margin-top:22px">
+          <div class="card-title" style="margin-bottom:8px">
+            <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+            选择前建议追问
+          </div>
+          <div class="ask-item"><span class="ask-box"></span>课程体系偏理论还是工程？</div>
+          <div class="ask-item"><span class="ask-box"></span>大类招生如何分流？</div>
+          <div class="ask-item"><span class="ask-box"></span>实习资源集中在哪些城市？</div>
+          <div class="ask-item"><span class="ask-box"></span>近三年毕业去向如何？</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAGE 6 : PROFILE ================= -->
+<section id="profile" class="page">
+  <div class="wrap section-pad">
+    <div class="breadcrumb">个人中心</div>
+
+    <div class="card profile-top">
+      <div class="profile-id">
+        <span class="profile-star"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg></span>
+        <div><h2>个人中心</h2><p>集中查看保存的核验报告、学校与专业。</p></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-card"><div class="lab">核验报告</div><div class="num">6</div></div>
+        <div class="stat-card"><div class="lab">收藏学校</div><div class="num">4</div></div>
+        <div class="stat-card"><div class="lab">收藏专业</div><div class="num">3</div></div>
+        <div class="stat-card"><div class="lab">最近浏览</div><div class="num">12</div></div>
+      </div>
+    </div>
+
+    <div class="profile-body">
+      <div class="card" style="padding:24px">
+        <div class="card-title" style="margin-bottom:16px">
+          <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg></span>
+          核验报告
+        </div>
+        <input class="search-saved" placeholder="搜索历史查询" oninput="renderVerifyHistory(this.value)">
+
+        <div id="historyList"></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:24px">
+          <button class="btn btn-primary" onclick="go('verify')">批量重新核验</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="padding:24px">
+          <div class="card-title" style="margin-bottom:12px">
+            <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
+            收藏夹
+          </div>
+          <button class="fav-link" type="button" onclick="openFavoriteGroup('focus')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>重点关注 <span class="fav-count">3 ›</span></button>
+          <button class="fav-link" type="button" onclick="openFavoriteGroup('reach')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>冲刺学校 <span class="fav-count">4 ›</span></button>
+          <button class="fav-link" type="button" onclick="openFavoriteGroup('safe')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>稳妥选择 <span class="fav-count">2 ›</span></button>
+          <button class="fav-link" type="button" onclick="openFavoriteGroup('major')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>专业备选 <span class="fav-count">3 ›</span></button>
+        </div>
+
+        <div class="card" style="padding:24px;margin-top:22px">
+          <div class="card-title" style="margin-bottom:12px">
+            <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+            待核验提醒
+          </div>
+          <button class="update-item" type="button" onclick="openFavoriteGroup('focus')"><span>收藏学校待补官方依据</span><span class="date">去处理 ›</span></button>
+          <button class="update-item" type="button" onclick="go('profile')"><span>历史报告可继续复核</span><span class="date">查看 ›</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAGE 7 : FAVORITES ================= -->
+<section id="favorites" class="page">
+  <div class="wrap section-pad">
+    <div class="breadcrumb">个人中心 / 收藏夹</div>
+    <div class="major-head">
+      <div>
+        <h1 class="h1" id="favoriteTitle">重点关注</h1>
+        <p style="color:var(--ink-2);margin-top:8px">集中查看收藏的学校和专业，后续可接入账号收藏数据。</p>
+      </div>
+      <button class="btn btn-outline" type="button" onclick="go('profile')">返回个人中心</button>
+    </div>
+
+    <div class="favorite-tabs">
+      <button class="favorite-tab active" type="button" data-fav="focus" onclick="openFavoriteGroup('focus')">重点关注</button>
+      <button class="favorite-tab" type="button" data-fav="reach" onclick="openFavoriteGroup('reach')">冲刺学校</button>
+      <button class="favorite-tab" type="button" data-fav="safe" onclick="openFavoriteGroup('safe')">稳妥选择</button>
+      <button class="favorite-tab" type="button" data-fav="major" onclick="openFavoriteGroup('major')">专业备选</button>
+    </div>
+
+    <div class="card" style="padding:24px">
+      <div class="card-title" style="margin-bottom:16px">
+        <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
+        <span id="favoriteListTitle">重点关注列表</span>
+      </div>
+      <div id="favoriteList" class="favorite-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAGE 8 : SCHOOL DETAIL ================= -->
+<section id="schoolDetail" class="page">
+  <div class="wrap section-pad">
+    <div class="breadcrumb">个人中心 / 收藏夹 / 学校详情</div>
+    <div class="major-head">
+      <div>
+        <h1 class="h1" id="schoolDetailName">深圳大学</h1>
+        <p id="schoolDetailDesc" style="color:var(--ink-2);margin-top:8px">查看收藏理由、核验重点和后续操作。</p>
+      </div>
+      <button class="btn btn-outline" type="button" onclick="go('favorites')">返回收藏夹</button>
+    </div>
+
+    <div class="school-detail-grid">
+      <div class="card" style="padding:24px">
+        <div class="card-title">
+          <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/></svg></span>
+          学校关注概览
+        </div>
+        <div class="detail-kv">
+          <div class="meta-card"><b>收藏分组</b><span id="schoolDetailGroup">重点关注</span></div>
+          <div class="meta-card"><b>关注状态</b><span id="schoolDetailStatus">待核验</span></div>
+          <div class="meta-card"><b>优先核验</b><span id="schoolDetailFocus">专业组、校区、位次</span></div>
+          <div class="meta-card"><b>数据来源</b><span>收藏记录 / 后续接入官方数据</span></div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:22px;flex-wrap:wrap">
+          <button class="btn btn-primary" type="button" onclick="addCurrentSchoolToCompare()">加入对比</button>
+          <button class="btn btn-outline" type="button" onclick="verifyCurrentSchoolClaim()">核验学校说法</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding:24px">
+        <div class="card-title">
+          <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+          需要重点确认
+        </div>
+        <div id="schoolDetailRisks" class="detail-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="./truth-verify-api.js"></script>
+
+<div class="favorite-modal" id="favoritePicker" onclick="closeFavoritePicker(event)">
+  <div class="favorite-dialog" onclick="event.stopPropagation()">
+    <h3 id="favoritePickerTitle"></h3>
+    <p id="favoritePickerDesc" style="display:none"></p>
+    <div class="favorite-choice-grid">
+      <button class="favorite-choice" type="button" data-fav-choice="focus" onclick="confirmFavoriteGroup('focus')"><span></span><small></small></button>
+      <button class="favorite-choice" type="button" data-fav-choice="reach" onclick="confirmFavoriteGroup('reach')"><span></span><small></small></button>
+      <button class="favorite-choice" type="button" data-fav-choice="safe" onclick="confirmFavoriteGroup('safe')"><span></span><small></small></button>
+      <button class="favorite-choice" type="button" data-fav-choice="major" onclick="confirmFavoriteGroup('major')"><span></span><small></small></button>
+    </div>
+  </div>
+</div>
+<div class="favorite-toast" id="favoriteToast"></div>
+
+<script>
+  window.TRUTH_VERIFY_API_BASE_URL = window.TRUTH_VERIFY_API_BASE_URL || (window.location.protocol === "file:" ? "http://localhost:3000" : window.location.origin);
+  window.VERIFY_API_URL = window.TRUTH_VERIFY_API_BASE_URL + "/api/verify";
+  const mockVerifyResult={
+    claim:'某大学转专业很容易，宿舍也不错，就业基本不用担心。',
+    status:'completed',
+    truth_score:72,
+    verdict:'部分可信',
+    summary:'该说法有部分依据，但存在夸大表达，需要确认学院、校区和年份范围。',
+    risk_tags:['片面表达','需确认范围','就业结论过宽'],
+    models:[
+      {role:'官方核验',verdict:'部分支持',confidence:.82,reason:'公开政策支持转专业通道存在，但不同学院名额和考核条件不同。',evidence_ids:['source-001','source-002']},
+      {role:'就业分析',verdict:'谨慎采信',confidence:.68,reason:'就业质量报告只能说明整体趋势，不能推出所有专业都不用担心。',evidence_ids:['source-003']},
+      {role:'校园体验',verdict:'可参考',confidence:.61,reason:'宿舍体验受校区、楼栋和年份影响，单一经验不能直接泛化。',evidence_ids:['source-004']},
+      {role:'风险识别',verdict:'发现夸大',confidence:.88,reason:'“很容易”“不用担心”属于绝对化表达，建议改为可核验问题。',evidence_ids:[]}
+    ],
+    evidence:[
+      {id:'source-001',title:'本科生转专业管理办法',publisher:'学校本科生院',url:'https://example.edu.cn/transfer',published_at:'2025-01-01',fetched_at:'2026-07-06',quote:'学生可按规定申请转专业，学院可设置考核条件。',scope:'2025级本科生，具体以学院通知为准',supports:'partial'},
+      {id:'source-002',title:'2025 年招生章程',publisher:'学校招生办公室',url:'https://example.edu.cn/admission',published_at:'2025-05-20',fetched_at:'2026-07-06',quote:'录取后培养校区和专业安排以学校公布为准。',scope:'2025年招生批次',supports:'partial'},
+      {id:'source-003',title:'2024 届就业质量报告',publisher:'学校就业指导中心',url:'https://example.edu.cn/career-report',published_at:'2025-01-15',fetched_at:'2026-07-06',quote:'毕业去向落实率按学院和专业存在差异。',scope:'2024届毕业生',supports:'partial'}
+    ],
+    conflicts:['不同学院转专业名额与考核条件不同，不能用“很容易”概括。','宿舍评价可能对应特定校区，需确认录取专业所在校区。'],
+    limitations:['当前证据不能证明所有专业就业都不用担心。','缺少目标学院近两年的转专业通过率。'],
+    next_questions:['目标专业所在学院近两年转专业通过率是多少？','该专业对应哪个校区和宿舍条件？','就业数据是否能细分到具体专业？']
+  };
+
+  function esc(v){
+    return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function pickClaimTags(claim){
+    const tags=[];
+    if(/转专业/.test(claim))tags.push('转专业');
+    if(/宿舍|校区/.test(claim))tags.push('宿舍/校区');
+    if(/就业|高薪|工作/.test(claim))tags.push('就业');
+    if(/专业/.test(claim)&&!tags.includes('转专业'))tags.push('专业');
+    return tags.length?tags:['待核验说法'];
+  }
+  function supportLabel(supports){
+    return {yes:'支持',support:'支持',partial:'部分支持',no:'不支持',conflict:'有冲突'}[supports]||'已核验';
+  }
+  function renderVerifyResult(data){
+    const score=Math.max(0,Math.min(100,Number(data.truth_score)||0));
+    document.getElementById('resultClaim').textContent=data.claim||'';
+    document.getElementById('resultClaimTags').innerHTML=pickClaimTags(data.claim||'').map(t=>`<span class="chip">${esc(t)}</span>`).join('');
+    document.getElementById('resultScore').textContent=score;
+    document.getElementById('resultScoreArc').setAttribute('stroke-dashoffset',String(264-(264*score/100)));
+    document.getElementById('resultVerdict').textContent=data.verdict||'综合结论';
+    document.getElementById('resultSummary').textContent=data.summary||'暂无综合结论。';
+    document.getElementById('resultRiskTags').innerHTML=(data.risk_tags||[]).map(t=>`<span class="tag-amber">${esc(t)}</span>`).join('')||'<span class="tag-amber">需进一步核实</span>';
+    document.getElementById('resultModels').innerHTML=(data.models||[]).map(m=>`
+      <div class="model-item">
+        <span class="mname">${esc(m.role)}</span>
+        <span class="mverdict">${esc(m.verdict)}</span>
+        <span class="mdesc">${esc(m.reason)}${typeof m.confidence==='number'?`｜置信度 ${Math.round(m.confidence*100)}%`:''}</span>
+      </div>`).join('');
+    document.getElementById('resultEvidence').innerHTML=(data.evidence||[]).map(e=>`
+      <div class="evidence-item">
+        <span class="name">${esc(e.title)}<span class="evidence-meta">${esc(e.publisher||'')} · ${esc(e.published_at||'')} · ${esc(e.scope||'')}</span></span>
+        <span class="tag-green">已核验</span>
+        <a class="link-view" href="${esc(e.url||'#')}" target="_blank" rel="noopener">${esc(supportLabel(e.supports))} ›</a>
+      </div>`).join('')||'<div class="conflict-line"><span class="dot"></span>暂无可展示依据。</div>';
+    const lines=[
+      ...(data.conflicts||[]).map(v=>'冲突：'+v),
+      ...(data.limitations||[]).map(v=>'局限：'+v),
+      ...(data.next_questions||[]).map(v=>'追问：'+v)
+    ];
+    document.getElementById('resultConflicts').innerHTML=lines.map(v=>`<div class="conflict-line"><span class="dot"></span>${esc(v)}</div>`).join('');
+  }
+  function setVerifyLoading(claim){
+    renderVerifyResult({
+      claim,
+      status:'loading',
+      truth_score:0,
+      verdict:'正在核验',
+      summary:'正在调用后端 API、双模型和证据链路，请稍等。',
+      risk_tags:['请求中'],
+      models:[
+        {role:'后端 API',verdict:'请求中',confidence:0,reason:'正在提交到 /api/verify。'},
+        {role:'数据更新',verdict:'等待返回',confidence:0,reason:'返回后会自动刷新本页各个模块。'}
+      ],
+      evidence:[],
+      conflicts:[],
+      limitations:[],
+      next_questions:[]
+    });
+  }
+  function makeVerifyErrorResult(claim, err){
+    return {
+      claim,
+      status:'api_error',
+      truth_score:0,
+      verdict:'接口未连接',
+      summary:'前端已经接收到你的输入，但没有拿到后端 /api/verify 的真实返回，所以页面不会再显示旧的假数据。',
+      risk_tags:['后端未启动','API 未返回','请检查 Network'],
+      models:[
+        {role:'前端请求',verdict:'已发起',confidence:0,reason:'runVerify() 已调用 TruthVerifyAPI.verifyClaim(claim)。'},
+        {role:'后端接口',verdict:'未返回',confidence:0,reason:'请确认 node mock-verify-server-updated.js 已启动，并且 http://localhost:3000/health 可打开。'},
+        {role:'错误信息',verdict:'待排查',confidence:0,reason:err&&err.message?err.message:String(err||'未知错误')}
+      ],
+      evidence:[],
+      conflicts:['没有看到 /api/verify 的 200 JSON 返回时，说明链路还没有跑通。'],
+      limitations:['这不是模型判断结果，而是接口联调状态提示。'],
+      next_questions:['打开 F12 → Network，点击开始核验，检查 /api/verify 是否出现 POST 200。','打开 http://localhost:3000/health，确认 has_gonka_key 和 has_supabase 是否为 true。']
+    };
+  }
+  async function runVerify(){
+    const claim=document.getElementById('claimInput').value.trim();
+    if(!claim)return;
+    let data=null;
+    setVerifyLoading(claim);
+    go('result');
+    if(window.TruthVerifyAPI){
+      try{
+        data=await window.TruthVerifyAPI.verifyClaim(claim,{
+          province:document.getElementById('verifyProvince')?.value||'',
+          subject:document.getElementById('verifySubject')?.value||'',
+          depth:document.getElementById('verifyDepth')?.value||''
+        });
+      }catch(err){
+        console.warn('TruthVerifyAPI unavailable, using mock result',err);
+        data=makeVerifyErrorResult(claim,err);
+      }
+    }else if(window.VERIFY_API_URL){
+      try{
+        const res=await fetch(window.VERIFY_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+          claim,
+          province:document.getElementById('verifyProvince')?.value||'',
+          subject:document.getElementById('verifySubject')?.value||'',
+          depth:document.getElementById('verifyDepth')?.value||''
+        })});
+        if(res.ok)data=await res.json();
+      }catch(err){
+        console.warn('verify api unavailable, using mock result',err);
+        data=makeVerifyErrorResult(claim,err);
+      }
+    }
+    if(!data)data=makeVerifyErrorResult(claim,new Error('未找到可用 API 调用脚本'));
+    renderVerifyResult(data);
+    if(data.status==='completed')saveVerifyHistory(data);
+  }
+  function go(id){
+    if(!document.getElementById(id))return;
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    // nav active state
+    const map={verify:'verify',result:'verify',compare:'compare',major:'major',profile:'profile',favorites:'profile',schoolDetail:'profile'};
+    document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+    const key=map[id];
+    if(key){const el=document.querySelector('.nav-link[data-page="'+key+'"]');if(el)el.classList.add('active');}
+    if(id==='profile')renderVerifyHistory();
+    window.scrollTo({top:0,behavior:'instant'});
+  }
+  function updCount(){
+    const t=document.getElementById('claimInput');
+    document.getElementById('cc').textContent=t.value.length;
+    updateRecognizedInfo(t.value);
+  }
+  function detectClaimClient(claim){
+    const schools=['深圳大学','中山大学','华南师范大学','华南理工大学','暨南大学','广州大学','广东工业大学','北京大学','清华大学','复旦大学','上海交通大学','浙江大学','武汉大学','四川大学'];
+    const matchedSchool=schools.find(name=>claim.includes(name))||(claim.includes('某大学')?'某大学':'未识别学校');
+    const topicRules=[
+      {label:'转专业',keywords:['转专业','换专业','跨学院']},
+      {label:'宿舍',keywords:['宿舍','寝室','住宿','四人间','独卫']},
+      {label:'交通/校区',keywords:['交通','地铁','校区','位置','通勤']},
+      {label:'就业',keywords:['就业','工作','薪资','大厂','实习']},
+      {label:'录取信息',keywords:['录取','位次','分数','专业组','招生']},
+      {label:'地理位置',keywords:['坐落','位于','城市','深圳','广州']},
+      {label:'学习升学',keywords:['保研','考研','升学','学习氛围']}
+    ];
+    const topics=topicRules.filter(rule=>rule.keywords.some(word=>claim.includes(word))).map(rule=>rule.label);
+    return {school:matchedSchool,topics:topics.length?topics:['待识别话题']};
+  }
+  function updateRecognizedInfo(claim){
+    const box=document.getElementById('recognizedInfo');
+    if(!box)return;
+    const result=detectClaimClient(claim||'');
+    const chips=[`学校：${result.school}`,...result.topics.map(t=>`话题：${t}`)];
+    box.innerHTML=chips.map(text=>`<span class="chip">${esc(text)}</span>`).join('');
+  }
+  function clearClaim(){
+    document.getElementById('claimInput').value='';updCount();
+  }
+  function getVerifyHistory(){
+    try{return JSON.parse(localStorage.getItem('truth_verify_history')||'[]')}catch(err){return []}
+  }
+  function setVerifyHistory(list){
+    localStorage.setItem('truth_verify_history',JSON.stringify(list.slice(0,30)));
+  }
+  function saveVerifyHistory(report){
+    const list=getVerifyHistory();
+    const item={
+      id:String(Date.now()),
+      claim:report.claim||'未命名核验',
+      truth_score:Number(report.truth_score)||0,
+      verdict:report.verdict||'待判断',
+      risk_tags:report.risk_tags||[],
+      created_at:new Date().toISOString(),
+      report
+    };
+    setVerifyHistory([item,...list]);
+    renderVerifyStats();
+  }
+  function renderVerifyStats(){
+    const nums=document.querySelectorAll('.stat-card .num');
+    const history=getVerifyHistory();
+    if(nums[0])nums[0].textContent=String(history.length);
+  }
+  function renderVerifyHistory(keyword=''){
+    const box=document.getElementById('historyList');
+    if(!box)return;
+    const q=keyword.trim().toLowerCase();
+    const list=getVerifyHistory().filter(item=>!q||item.claim.toLowerCase().includes(q)||item.verdict.toLowerCase().includes(q));
+    if(!list.length){
+      box.innerHTML=`<div class="report-item"><div><div class="rtitle">暂无历史查询</div><div class="rmeta">完成一次核验后，报告会自动保存在这里。</div></div><span class="tag-amber">本地记忆</span><button class="btn btn-outline" style="padding:9px 16px;font-size:14px" onclick="go('verify')">去核验</button></div>`;
+      return;
+    }
+    box.innerHTML=list.map(item=>`
+      <div class="report-item">
+        <div><div class="rtitle">${esc(item.claim)}</div><div class="rmeta">${new Date(item.created_at).toLocaleString()} · 本地历史</div></div>
+        <div class="rscore"><small>Truth Score</small><b>${esc(item.truth_score)}</b></div>
+        <span class="tag-amber">${esc(item.verdict)}</span>
+        <button class="btn btn-outline" style="padding:9px 16px;font-size:14px" onclick="openHistoryReport('${esc(item.id)}')">查看报告</button>
+      </div>`).join('');
+  }
+  function openHistoryReport(id){
+    const item=getVerifyHistory().find(row=>row.id===id);
+    if(!item)return;
+    renderVerifyResult(item.report);
+    go('result');
+  }
+  let verifyHistoryCache=[];
+  async function fetchVerifyHistory(keyword=''){
+    if(!window.TruthVerifyAPI||!window.TruthVerifyAPI.getVerifyReports){
+      return {source:'localStorage',reports:getVerifyHistory()};
+    }
+    const data=await window.TruthVerifyAPI.getVerifyReports({q:keyword,limit:30});
+    return {source:data.source||'supabase.verify_reports',reports:data.reports||[]};
+  }
+  function saveVerifyHistory(report){
+    if(report.cloud_saved){
+      renderVerifyHistory();
+      return;
+    }
+    const list=getVerifyHistory();
+    const item={
+      id:String(Date.now()),
+      claim:report.claim||'未命名核验',
+      truth_score:Number(report.truth_score)||0,
+      verdict:report.verdict||'待判断',
+      risk_tags:report.risk_tags||[],
+      created_at:new Date().toISOString(),
+      report
+    };
+    setVerifyHistory([item,...list]);
+    renderVerifyStats();
+  }
+  function renderVerifyStats(){
+    const nums=document.querySelectorAll('.stat-card .num');
+    const history=verifyHistoryCache.length?verifyHistoryCache:getVerifyHistory();
+    if(nums[0])nums[0].textContent=String(history.length);
+  }
+  async function renderVerifyHistory(keyword=''){
+    const box=document.getElementById('historyList');
+    if(!box)return;
+    const q=keyword.trim().toLowerCase();
+    box.innerHTML=`<div class="report-item"><div><div class="rtitle">正在读取历史报告</div><div class="rmeta">优先从 Supabase verify_reports 读取云端记忆。</div></div><span class="tag-amber">云端记忆</span></div>`;
+    let source='localStorage';
+    let all=[];
+    try{
+      const result=await fetchVerifyHistory(keyword);
+      source=result.source;
+      all=result.reports;
+      verifyHistoryCache=all;
+    }catch(err){
+      console.warn('cloud history unavailable, using local history',err);
+      all=getVerifyHistory();
+      verifyHistoryCache=all;
+    }
+    const list=all.filter(item=>!q||String(item.claim||'').toLowerCase().includes(q)||String(item.verdict||'').toLowerCase().includes(q));
+    renderVerifyStats();
+    if(!list.length){
+      box.innerHTML=`<div class="report-item"><div><div class="rtitle">暂无历史查询</div><div class="rmeta">完成一次核验后，报告会自动保存到 Supabase verify_reports。</div></div><span class="tag-amber">云端记忆</span><button class="btn btn-outline" style="padding:9px 16px;font-size:14px" onclick="go('verify')">去核验</button></div>`;
+      return;
+    }
+    box.innerHTML=list.map(item=>`
+      <div class="report-item">
+        <div><div class="rtitle">${esc(item.claim)}</div><div class="rmeta">${new Date(item.created_at).toLocaleString()} · ${source==='localStorage'?'本地兜底':'Supabase verify_reports'}</div></div>
+        <div class="rscore"><small>Truth Score</small><b>${esc(item.truth_score)}</b></div>
+        <span class="tag-amber">${esc(item.verdict)}</span>
+        <button class="btn btn-outline" style="padding:9px 16px;font-size:14px" onclick="openHistoryReport('${esc(item.id)}')">查看报告</button>
+      </div>`).join('');
+  }
+  function openHistoryReport(id){
+    const item=(verifyHistoryCache.length?verifyHistoryCache:getVerifyHistory()).find(row=>String(row.id)===String(id));
+    if(!item)return;
+    renderVerifyResult(item.report);
+    go('result');
+  }
+  const favoriteGroups={
+    focus:{
+      title:'重点关注',
+      items:[
+        {type:'school',name:'深圳大学',desc:'关注城市机会、交通便利和计算机相关专业。'},
+        {type:'school',name:'中山大学',desc:'关注综合实力、校区差异和专业录取风险。'},
+        {type:'school',name:'华南师范大学',desc:'关注师范类优势、校区位置和专业适配。'}
+      ]
+    },
+    reach:{
+      title:'冲刺学校',
+      items:[
+        {type:'school',name:'中山大学',desc:'冲刺档，需重点核验专业组和位次波动。'},
+        {type:'school',name:'华南理工大学',desc:'冲刺档，关注工科专业竞争和录取位次。'},
+        {type:'school',name:'暨南大学',desc:'冲刺档，关注城市机会和专业组差异。'},
+        {type:'school',name:'深圳大学',desc:'冲刺/稳妥之间，需结合省份和科类判断。'}
+      ]
+    },
+    safe:{
+      title:'稳妥选择',
+      items:[
+        {type:'school',name:'广东工业大学',desc:'稳妥档，适合关注工科与就业机会。'},
+        {type:'school',name:'广州大学',desc:'稳妥档，关注城市资源和专业匹配。'}
+      ]
+    },
+    major:{
+      title:'专业备选',
+      items:[
+        {type:'major',name:'计算机科学与技术',desc:'关注课程强度、就业泛化和学校培养方向。'},
+        {type:'major',name:'法学',desc:'关注院校层次、升学路径和职业资格周期。'},
+        {type:'major',name:'软件工程',desc:'关注实践项目、学费差异和就业方向。'}
+      ]
+    }
+  };
+  let currentSchoolDetail=null;
+  let pendingFavoriteItem=null;
+  function initFavoritePickerText(){
+    const text={
+      title:'\u9009\u62e9\u6536\u85cf\u76ee\u5f55',
+      desc:'\u9009\u62e9\u540e\u4f1a\u4fdd\u5b58\u5230\u5bf9\u5e94\u6536\u85cf\u5939\uff0c\u5f53\u524d\u9875\u9762\u4e0d\u4f1a\u8df3\u8f6c\u3002',
+      focus:['\u91cd\u70b9\u5173\u6ce8','\u6700\u9700\u8981\u6301\u7eed\u6838\u9a8c\u7684\u5b66\u6821\u6216\u4e13\u4e1a'],
+      reach:['\u51b2\u523a\u5b66\u6821','\u5206\u6570\u6216\u4f4d\u6b21\u6709\u6311\u6218\u7684\u5019\u9009\u5b66\u6821'],
+      safe:['\u7a33\u59a5\u9009\u62e9','\u66f4\u504f\u4fdd\u5e95\u3001\u7a33\u5b9a\u7684\u5019\u9009\u5b66\u6821'],
+      major:['\u4e13\u4e1a\u5907\u9009','\u91cd\u70b9\u5173\u6ce8\u4e13\u4e1a\u65b9\u5411\u548c\u57f9\u517b\u65b9\u6848']
+    };
+    const title=document.getElementById('favoritePickerTitle');
+    const desc=document.getElementById('favoritePickerDesc');
+    if(title)title.textContent=text.title;
+    if(desc)desc.textContent=text.desc;
+    document.querySelectorAll('[data-fav-choice]').forEach(btn=>{
+      const data=text[btn.dataset.favChoice];
+      if(!data)return;
+      const span=btn.querySelector('span');
+      const small=btn.querySelector('small');
+      if(span)span.textContent=data[0];
+      if(small)small.textContent=data[1];
+    });
+  }
+  function showFavoriteToast(text){
+    const toast=document.getElementById('favoriteToast');
+    if(!toast)return;
+    toast.textContent=text;
+    toast.classList.add('active');
+    clearTimeout(showFavoriteToast.timer);
+    showFavoriteToast.timer=setTimeout(()=>toast.classList.remove('active'),1800);
+  }
+  function openFavoritePicker(item){
+    pendingFavoriteItem=item;
+    const picker=document.getElementById('favoritePicker');
+    const desc=document.getElementById('favoritePickerDesc');
+    if(desc)desc.textContent='';
+    document.querySelectorAll('[data-fav-choice]').forEach(btn=>{
+      const key=btn.dataset.favChoice;
+      const show=item.type==='major'?key==='major':key!=='major';
+      btn.style.display=show?'block':'none';
+    });
+    if(picker)picker.classList.add('active');
+  }
+  function closeFavoritePicker(event){
+    if(event&&event.target&&event.target.id!=='favoritePicker')return;
+    const picker=document.getElementById('favoritePicker');
+    if(picker)picker.classList.remove('active');
+  }
+  function confirmFavoriteGroup(group){
+    if(!pendingFavoriteItem)return;
+    saveFavoriteItem(group,pendingFavoriteItem);
+    const title=(favoriteGroups[group]||favoriteGroups.focus).title;
+    const name=pendingFavoriteItem.name;
+    pendingFavoriteItem=null;
+    const picker=document.getElementById('favoritePicker');
+    if(picker)picker.classList.remove('active');
+    showFavoriteToast(`已收藏到「${title}」：${name}`);
+  }
+  function saveFavoriteItem(group,item){
+    const data=favoriteGroups[group]||favoriteGroups.focus;
+    const exists=data.items.some(row=>row.type===item.type&&row.name===item.name);
+    if(!exists)data.items.unshift(item);
+    updateFavoriteCounts();
+  }
+  function removeFavoriteItem(group,index){
+    const data=favoriteGroups[group]||favoriteGroups.focus;
+    const removed=data.items.splice(index,1)[0];
+    updateFavoriteCounts();
+    openFavoriteGroup(group);
+    if(removed)showFavoriteToast(`已移除：${removed.name}`);
+  }
+  function saveSchoolFavorite(name,group='focus'){
+    openFavoritePicker({
+      type:'school',
+      name,
+      desc:`已从学校对比中收藏，后续重点核验${name}的位次、校区、住宿和专业适配。`
+    });
+  }
+  function saveCurrentMajor(){
+    const title=document.getElementById('majorTitle');
+    const desc=document.getElementById('majorDesc');
+    const name=(title&&title.textContent.trim())||'当前专业';
+    openFavoritePicker({
+      type:'major',
+      name,
+      desc:(desc&&desc.textContent.trim())||`已收藏${name}，后续结合培养方案、就业方向和学校差异继续核验。`
+    });
+  }
+  function updateFavoriteCounts(){
+    const groupOrder=['focus','reach','safe','major'];
+    document.querySelectorAll('.fav-link .fav-count').forEach((el,index)=>{
+      const key=groupOrder[index];
+      if(key&&favoriteGroups[key])el.textContent=`${favoriteGroups[key].items.length} ›`;
+    });
+    const nums=document.querySelectorAll('.stat-card .num');
+    const schoolCount=Object.values(favoriteGroups).flatMap(group=>group.items).filter(item=>item.type==='school').length;
+    const majorCount=(favoriteGroups.major?.items||[]).filter(item=>item.type==='major').length;
+    if(nums[1])nums[1].textContent=String(schoolCount);
+    if(nums[2])nums[2].textContent=String(majorCount);
+  }
+  function getSchoolRiskLines(item, groupTitle){
+    const base=[
+      '录取位次和专业组需要结合省份、科类与年份确认。',
+      '校区、住宿和交通信息需要和具体专业匹配。',
+      '官方数据和学生反馈需要分开判断，不能混用。'
+    ];
+    if(groupTitle==='冲刺学校')return ['冲刺档需要重点核验位次波动。',...base.slice(1)];
+    if(groupTitle==='稳妥选择')return ['稳妥档也要确认专业组限制和调剂风险。',...base.slice(1)];
+    return base;
+  }
+  function openSchoolDetail(group,itemIndex){
+    const data=favoriteGroups[group]||favoriteGroups.focus;
+    const item=data.items[itemIndex];
+    if(!item||item.type!=='school')return;
+    currentSchoolDetail={...item,group,title:data.title};
+    document.getElementById('schoolDetailName').textContent=item.name;
+    document.getElementById('schoolDetailDesc').textContent=item.desc;
+    document.getElementById('schoolDetailGroup').textContent=data.title;
+    document.getElementById('schoolDetailStatus').textContent='收藏待核验';
+    document.getElementById('schoolDetailFocus').textContent=data.title==='冲刺学校'?'位次波动、专业组、调剂风险':'校区、专业适配、生活体验';
+    const risks=document.getElementById('schoolDetailRisks');
+    if(risks)risks.innerHTML=getSchoolRiskLines(item,data.title).map(line=>`<div class="detail-line">${esc(line)}</div>`).join('');
+    go('schoolDetail');
+  }
+  function addCurrentSchoolToCompare(){
+    if(currentSchoolDetail&&currentSchoolDetail.name&&!selectedSchools.includes(currentSchoolDetail.name)){
+      if(selectedSchools.length>=4)selectedSchools.shift();
+      selectedSchools.push(currentSchoolDetail.name);
+      compareApiRows=null;
+      compareApiSummary=[];
+    }
+    renderCompare('综合概览');
+    go('compare');
+  }
+  function verifyCurrentSchoolClaim(){
+    const school=currentSchoolDetail?.name||'该学校';
+    const input=document.getElementById('claimInput');
+    if(input){
+      input.value=`${school} 的住宿、交通和专业录取信息都可靠吗？`;
+      updCount();
+    }
+    go('verify');
+  }
+  function openFavoriteGroup(group='focus'){
+    const data=favoriteGroups[group]||favoriteGroups.focus;
+    document.getElementById('favoriteTitle').textContent=data.title;
+    document.getElementById('favoriteListTitle').textContent=data.title+'列表';
+    document.querySelectorAll('.favorite-tab').forEach(tab=>tab.classList.toggle('active',tab.dataset.fav===group));
+    const list=document.getElementById('favoriteList');
+    if(list)list.innerHTML=data.items.map((item,index)=>{
+      const viewAction=item.type==='school'?`openSchoolDetail('${group}',${index})`:`go('major')`;
+      const actionPage=item.type==='school'?'compare':'verify';
+      const viewLabel=item.type==='school'?'查看学校':'查看专业';
+      const actionLabel=item.type==='school'?'加入对比':'核验说法';
+      return `
+        <div class="favorite-card">
+          <button class="favorite-remove" type="button" aria-label="remove" onclick="removeFavoriteItem('${group}',${index})">\u00d7</button>
+          <h3>${esc(item.name)}</h3>
+          <p>${esc(item.desc)}</p>
+          <div class="favorite-actions">
+            <button class="btn btn-outline" type="button" onclick="${viewAction}">${viewLabel}</button>
+            <button class="btn btn-primary" type="button" onclick="go('${actionPage}')">${actionLabel}</button>
+          </div>
+        </div>`;
+    }).join('');
+    go('favorites');
+  }
+  function toggleHeroCardNav(){
+    const nav=document.getElementById('heroCardNav');
+    if(!nav)return;
+    const btn=nav.querySelector('.hero-cardnav-menu');
+    const content=nav.querySelector('.hero-cardnav-content');
+    const open=nav.classList.toggle('open');
+    if(btn){
+      btn.classList.toggle('open',open);
+      btn.setAttribute('aria-expanded',String(open));
+      btn.setAttribute('aria-label',open?'收起核验能力':'展开核验能力');
+    }
+    if(content)content.setAttribute('aria-hidden',String(!open));
+  }
+  const selectedSchools=['深圳大学','中山大学','华南师范大学'];
+  let compareApiRows=null;
+  let compareApiSummary=[];
+  const compareRows={
+    '综合概览':[
+      ['2025 录取位次',['全省 3,200 名左右','全省 5,000 名左右','全省 7,800 名左右','待补充']],
+      ['优势专业',['计算机、电子信息','人工智能、软件工程','法学、汉语言文学','待补充']],
+      ['升学率',['28% 较高','24% 中等','18% 中等偏低','待补充']],
+      ['城市机会',['广州 机会丰富','深圳 科技产业集中','武汉 机会中等','待补充']],
+      ['住宿条件',['四人间，上床下桌','四人间，独卫空调','六人间，公共卫浴','待确认']]
+    ],
+    '录取位次':[
+      ['近三年位次',['3,000-3,400','4,800-5,300','7,400-8,200','待补充']],
+      ['波动情况',['稳定','略有上升','波动较大','待补充']],
+      ['冲稳保判断',['冲稳之间','稳妥','保底偏稳','待判断']]
+    ],
+    '专业实力':[
+      ['优势方向',['电子信息、计算机','人工智能、软件工程','法学、中文','待补充']],
+      ['培养特点',['工程实践强','产业项目多','人文基础扎实','待补充']],
+      ['适配人群',['理工能力强','想进科技企业','偏人文社科','待补充']]
+    ],
+    '就业升学':[
+      ['就业城市',['广州、深圳','深圳、珠海','武汉、南京','待补充']],
+      ['升学倾向',['升学率较高','就业导向强','考研比例中等','待补充']],
+      ['风险点',['专业分流影响大','岗位竞争强','行业差异明显','待补充']]
+    ],
+    '校园环境':[
+      ['住宿条件',['四人间，上床下桌','四人间，独卫空调','六人间，公共卫浴','待确认']],
+      ['校区位置',['城市资源丰富','产业园区近','交通中等','待确认']],
+      ['生活便利',['较便利','便利','一般','待确认']]
+    ],
+    '转专业政策':[
+      ['申请门槛',['绩点要求较高','需学院考核','名额有限','待查证']],
+      ['可转范围',['学院内较清晰','跨学院需审核','部分专业受限','待查证']],
+      ['核验建议',['查本科生院文件','查学院细则','问目标学院','补充官方链接']]
+    ]
+  };
+  function renderCompare(tab='综合概览'){
+    const picker=document.getElementById('schoolPicker');
+    if(picker){
+      picker.querySelectorAll('.school-pill').forEach(p=>p.remove());
+      const addBox=document.getElementById('schoolAddBox');
+      selectedSchools.forEach((name,index)=>{
+        const pill=document.createElement('div');
+        pill.className='school-pill';
+
+        const favBtn=document.createElement('button');
+        favBtn.className='school-fav';
+        favBtn.type='button';
+        favBtn.title='favorite';
+        favBtn.setAttribute('aria-label','favorite '+name);
+        favBtn.textContent='\u2606';
+        favBtn.onclick=()=>saveSchoolFavorite(name);
+
+        const nameSpan=document.createElement('span');
+        nameSpan.textContent=name;
+
+        const removeBtn=document.createElement('button');
+        removeBtn.className='x';
+        removeBtn.type='button';
+        removeBtn.setAttribute('aria-label','remove '+name);
+        removeBtn.textContent='\u00d7';
+        removeBtn.onclick=()=>removeSchool(index);
+
+        pill.appendChild(favBtn);
+        pill.appendChild(nameSpan);
+        pill.appendChild(removeBtn);
+        picker.insertBefore(pill,addBox);
+      });
+    }
+    const head=document.getElementById('compareHead');
+    const body=document.getElementById('compareBody');
+    if(head)head.innerHTML='<tr><th>对比维度</th>'+selectedSchools.map(s=>`<th>${esc(s)}</th>`).join('')+'</tr>';
+    const rows=(compareApiRows&&compareApiRows[tab])||compareRows[tab]||compareRows['综合概览'];
+    if(body)body.innerHTML=rows.map(row=>'<tr><th>'+esc(row[0])+'</th>'+selectedSchools.map((_,i)=>`<td>${esc(row[1][i]||'待补充')}</td>`).join('')+'</tr>').join('');
+    const fit=document.getElementById('fitGrid');
+    if(fit)fit.innerHTML=selectedSchools.map((s,i)=>`<p><b>${esc(s)}：</b>${esc(compareApiSummary[i]||['更适合看重升学与一线城市机会的同学。','更适合关注科技企业发展与实习机会的同学。','更适合关注人文社科方向、注重性价比的同学。','需要补充学校定位与官方资料后再判断。'][i]||'需要补充学校资料后再判断。')}</p>`).join('');
+    updateSchoolCount();
+  }
+  function compareFallbackCell(schoolName,field){
+    const strength={
+      '深圳大学':'模型综合：计算机、电子信息、设计和经管较受关注',
+      '中山大学':'模型综合：医学、经管、法学、计算机等综合实力强',
+      '华南师范大学':'模型综合：师范教育、心理学、计算机和文科方向'
+    };
+    const city={
+      '深圳大学':'模型综合：深圳科技产业集中，实习就业机会强',
+      '中山大学':'模型综合：广州高校资源密集，综合机会丰富',
+      '华南师范大学':'模型综合：广州教育资源集中，师范方向优势明显'
+    };
+    const map={
+      '2025 录取位次':'模型综合：需按省份查近三年专业组位次',
+      '优势专业':strength[schoolName]||'模型综合：结合学科实力、培养方案和就业报告判断',
+      '升学率':'模型综合：看就业质量报告、保研率和考研去向',
+      '城市机会':city[schoolName]||'模型综合：看城市产业、实习半径和校友资源',
+      '住宿条件':'模型综合：需按具体校区核验宿舍新旧和配置',
+      '交通便利':'模型综合：看校区位置、地铁距离和通勤成本',
+      '校园环境':'模型综合：看校区新旧、面积和生活配套',
+      '学习氛围':'模型综合：看学院竞争强度、升学目标和专业差异',
+      '风险提示':'模型综合：需用官方数据和学生反馈交叉验证'
+    };
+    return map[field]||'模型综合：需结合 RAG 和官方资料继续核验';
+  }
+  function normalizeCompareCell(value,schoolName,field){
+    const text=String(value||'').trim();
+    if(!text||/待接入|暂无|需接入|待补充|待确认|暂无足够/.test(text))return compareFallbackCell(schoolName,field);
+    if(/^(是|有|不是|没有|否|是\s*\/\s*是|有\s*\/\s*有|不是\s*\/\s*不是)$/.test(text))return compareFallbackCell(schoolName,field);
+    if(text.length<=6)return compareFallbackCell(schoolName,field);
+    return text;
+  }
+  function getCompareCell(schools,name,field){
+    const school=(schools||[]).find(item=>item.name===name)||{};
+    const value=school.rows&&school.rows[field]?school.rows[field]:'';
+    return normalizeCompareCell(value,name,field);
+  }
+  function buildCompareRowsFromApi(schools){
+    const fields=['2025 录取位次','优势专业','升学率','城市机会','住宿条件','交通便利','校园环境','学习氛围','风险提示'];
+    const rows=fields.map(field=>[
+      field,
+      selectedSchools.map(name=>{
+        return getCompareCell(schools,name,field);
+      })
+    ]);
+    return {
+      '综合概览':rows,
+      '校园环境':rows.filter(row=>['住宿条件','交通便利','校园环境','风险提示'].includes(row[0])),
+      '就业升学':[
+        ['学习氛围',selectedSchools.map(name=>getCompareCell(schools,name,'学习氛围'))],
+        ['升学率',selectedSchools.map(name=>getCompareCell(schools,name,'升学率'))],
+        ['风险提示',selectedSchools.map(name=>getCompareCell(schools,name,'风险提示'))]
+      ],
+      '录取位次':[
+        ['2025 录取位次',selectedSchools.map(name=>getCompareCell(schools,name,'2025 录取位次'))]
+      ],
+      '专业实力':[
+        ['优势专业',selectedSchools.map(name=>getCompareCell(schools,name,'优势专业'))]
+      ],
+      '转专业政策':compareRows['转专业政策']
+    };
+  }
+  function updateSchoolCount(){
+    const count=selectedSchools.length;
+    const el=document.getElementById('schoolCount');
+    if(el)el.textContent=String(count);
+    const addBox=document.getElementById('schoolAddBox');
+    if(addBox)addBox.style.display=count>=4?'none':'flex';
+  }
+  function removeSchool(index){
+    selectedSchools.splice(index,1);
+    compareApiRows=null;
+    compareApiSummary=[];
+    const active=document.querySelector('.cmp-tab.active');
+    renderCompare(active?active.textContent.trim():'综合概览');
+  }
+  function addSchool(){
+    if(selectedSchools.length>=4)return;
+    const input=document.getElementById('schoolInput');
+    const name=input?input.value:'';
+    if(!name||!name.trim())return;
+    const clean=name.trim().slice(0,20);
+    if(selectedSchools.includes(clean))return;
+    selectedSchools.push(clean);
+    compareApiRows=null;
+    compareApiSummary=[];
+    if(input)input.value='';
+    const active=document.querySelector('.cmp-tab.active');
+    renderCompare(active?active.textContent.trim():'综合概览');
+  }
+  async function startCompare(){
+    const firstTab=document.querySelector('.cmp-tab');
+    if(firstTab){
+      firstTab.parentElement.querySelectorAll('.cmp-tab').forEach(t=>t.classList.remove('active'));
+      firstTab.classList.add('active');
+    }
+    document.querySelectorAll('.quick-item').forEach((item,i)=>{
+      item.textContent=['正在读取 Supabase RAG','正在调用两个模型综合分析','返回后表格会自动刷新'][i]||item.textContent;
+    });
+    renderCompare('综合概览');
+    if(window.TruthVerifyAPI){
+      try{
+        const data=await window.TruthVerifyAPI.compareSchools(selectedSchools);
+        compareApiRows=buildCompareRowsFromApi(data.schools||[]);
+        compareApiSummary=(data.schools||[]).map(s=>s.summary||'已返回该校对比数据。');
+        document.querySelectorAll('.quick-item').forEach((item,i)=>{
+          item.textContent=(data.quick_conclusions||['已连接 RAG + 两模型对比接口','当前数据来自 /api/school-compare','官方数据源后续继续补充'])[i]||item.textContent;
+        });
+      }catch(err){
+        console.warn('school compare api unavailable, using static rows',err);
+        document.querySelectorAll('.quick-item').forEach((item,i)=>{
+          item.textContent=['接口暂不可用，已显示本地静态数据','请确认后端是否启动','Network 中查看 /api/school-compare'][i]||item.textContent;
+        });
+      }
+    }
+    renderCompare('综合概览');
+  }
+  function filterReports(keyword){
+    const q=keyword.trim().toLowerCase();
+    document.querySelectorAll('.report-item').forEach(item=>{
+      item.style.display=item.innerText.toLowerCase().includes(q)?'grid':'none';
+    });
+  }
+  function cmpTab(el){
+    el.parentElement.querySelectorAll('.cmp-tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    renderCompare(el.textContent.trim());
+  }
+
+  const majorProfilesClean=[
+    {keys:['计算机','计算机科学','计算机科学与技术'],name:'计算机科学与技术',desc:'学习计算机系统、软件、算法与工程方法，方向差异较大，应结合学校培养方案判断。',meta:['数学、逻辑、持续学习','开发、算法、系统、安全','培养方案、学院官网、就业质量报告'],learn:[['基础课程','程序设计、离散数学、数据结构'],['核心课程','操作系统、计算机网络、数据库'],['方向选修','人工智能、系统安全、图形学'],['实践项目','课程设计、工程实训、毕业设计']],careers:['软件开发','算法与数据','系统与安全','读研深造'],claims:[['学计算机一定好就业？','表达过宽'],['不考研就没有出路？','缺少依据'],['数学不好不能学？','部分片面']],questions:['课程体系偏理论还是工程？','大类招生如何分流？','实习资源集中在哪些城市？','近三年毕业去向如何？']},
+    {keys:['软件工程'],name:'软件工程',desc:'更强调软件开发流程、工程实践、项目管理与团队协作，需关注学校是否有足够实践项目。',meta:['编程、工程意识、协作','后端、前端、测试、架构','培养方案、实训安排、就业报告'],learn:[['基础课程','程序设计、数据结构、数据库'],['核心课程','软件工程、需求分析、项目管理'],['方向选修','云计算、移动开发、软件测试'],['实践项目','企业实训、团队项目、毕业设计']],careers:['软件开发','测试与质量','产品技术','项目管理'],claims:[['软件工程比计算机更好就业？','需要分学校'],['只会写代码就够了？','过于片面'],['软件工程学费都很高？','需看学校']],questions:['是否有企业实训？','课程偏工程还是理论？','学费和培养模式是否特殊？','就业岗位集中在哪些方向？']},
+    {keys:['人工智能','智能科学'],name:'人工智能',desc:'围绕机器学习、深度学习、数据与智能系统展开，对数学、编程和实践平台要求较高。',meta:['数学、编程、统计思维','算法、数据、智能系统','培养方案、实验平台、科研方向'],learn:[['基础课程','高数、线代、概率、程序设计'],['核心课程','机器学习、深度学习、数据挖掘'],['方向选修','计算机视觉、自然语言处理'],['实践项目','模型训练、数据项目、科研训练']],careers:['算法工程','数据科学','智能产品','读研科研'],claims:[['人工智能一定比计算机高级？','概念夸大'],['本科就能做算法岗？','需看能力'],['数学不好也能轻松学？','风险较高']],questions:['是否有真实算力和数据平台？','本科课程是否扎实？','是否鼓励读研？','算法岗比例是否真实？']},
+    {keys:['法学','法律'],name:'法学',desc:'学习法律体系、部门法、案例分析与法律实务，职业路径受院校层次、地区资源和资格考试影响明显。',meta:['阅读、表达、逻辑、写作','律师、法务、公检法、升学','法学院官网、培养方案、就业报告'],learn:[['基础课程','法理学、宪法、中国法制史'],['核心课程','民法、刑法、行政法、诉讼法'],['方向选修','商法、知识产权、国际法'],['实践项目','模拟法庭、法律诊所、实习']],careers:['律师方向','企业法务','公检法考试','读研深造'],claims:[['法学就是背书？','过于片面'],['五院四系外不能学法？','表达过宽'],['法学就业很差？','需分路径']],questions:['法考通过支持如何？','实习资源在哪些城市？','升学和公考比例如何？','是否有法律诊所项目？']},
+    {keys:['医学','临床医学','口腔医学'],name:'临床医学',desc:'医学培养周期长、课程强度高，对学校附属医院、临床资源和升学规培路径依赖明显。',meta:['记忆、责任心、抗压、持续学习','临床、规培、科研、医院就业','医学院官网、附属医院、就业质量报告'],learn:[['基础课程','解剖、生理、病理、生化'],['核心课程','内科、外科、妇产、儿科'],['方向选修','影像、麻醉、口腔、公共卫生'],['实践项目','见习、实习、临床轮转']],careers:['医院临床','规培深造','医学科研','公共卫生'],claims:[['医学越热门越适合？','需要匹配个人'],['本科毕业就很好就业？','需看规培'],['学医一定稳定？','表达过宽']],questions:['附属医院资源怎样？','是否有长学制或本博项目？','规培和升学路径如何？','临床实习安排在哪些医院？']},
+    {keys:['金融','金融学','经济','经济学'],name:'金融学',desc:'关注金融市场、公司金融、投资、计量与经济分析，就业受城市、院校平台和实习经历影响很大。',meta:['数学、统计、表达、商业理解','银行、券商、基金、企业财务','学院官网、培养方案、就业报告'],learn:[['基础课程','微观经济、宏观经济、会计学'],['核心课程','金融学、投资学、公司金融'],['方向选修','金融工程、量化、风险管理'],['实践项目','案例分析、实习、竞赛']],careers:['银行金融','证券基金','企业财务','读研留学'],claims:[['金融一定高薪？','表达过宽'],['普通学校金融没出路？','过于绝对'],['数学不好不能学金融？','部分片面']],questions:['就业去向是否真实？','实习资源在哪些城市？','是否偏量化或偏商科？','升学和考证支持如何？']},
+    {keys:['汉语言','汉语言文学','中文'],name:'汉语言文学',desc:'学习文学、语言学、写作与文化研究，适合文字表达、人文阅读和教育传媒方向。',meta:['阅读、写作、表达、审美','教育、编辑、传媒、公考','学院官网、培养方案、就业报告'],learn:[['基础课程','古代文学、现代文学、语言学'],['核心课程','文学理论、写作、古代汉语'],['方向选修','比较文学、文艺学、创意写作'],['实践项目','写作训练、教育实习、编辑实践']],careers:['教师方向','编辑出版','新媒体运营','公考升学'],claims:[['中文专业只能当老师？','表达过窄'],['就业面很窄？','需要分方向'],['不考研没有优势？','需看目标']],questions:['师范属性是否明确？','写作和实践课程多吗？','就业去向集中在哪里？','是否适合考公或读研？']},
+    {keys:['电子信息','通信工程','电子科学'],name:'电子信息类',desc:'涉及电路、信号、通信、嵌入式与硬件系统，实践平台和工科基础很关键。',meta:['数学、物理、电路、动手能力','通信、芯片、嵌入式、硬件研发','学院官网、实验平台、就业报告'],learn:[['基础课程','高数、大学物理、电路分析'],['核心课程','信号系统、通信原理、数字电路'],['方向选修','嵌入式、芯片、物联网'],['实践项目','电路实验、硬件项目、竞赛']],careers:['硬件研发','通信工程','嵌入式开发','芯片相关'],claims:[['电子信息就是修电脑？','明显错误'],['比计算机更难就业？','需要分方向'],['物理不好不能学？','部分片面']],questions:['实验平台是否充足？','偏通信还是偏微电子？','就业去向有哪些企业？','是否有保研和竞赛支持？']},
+    {keys:['光学','光学工程','光电','光电信息'],name:'光学工程',desc:'围绕光学系统、光电检测、激光技术、成像与光电信息处理展开，通常要求较强的数学、物理和实验能力。',meta:['数学、物理、实验、工程建模','光电器件、激光、成像、检测、仪器','培养方案、实验平台、学院官网、就业质量报告'],learn:[['基础课程','高等数学、大学物理、工程光学'],['核心课程','物理光学、激光原理、光电检测'],['方向选修','光通信、机器视觉、光学设计'],['实践项目','光学实验、仪器调试、工程设计或科研训练']],careers:['光电工程师','仪器与检测','激光与成像','读研科研'],claims:[['光学工程就是冷门专业？','需要分学校和方向'],['毕业只能进工厂？','表达过窄'],['物理不好也能轻松学？','风险较高']],questions:['学校是否有光电实验平台？','方向偏光通信、激光还是成像？','本科就业和读研比例如何？','对应企业和城市机会在哪里？']}
+  ];
+  function buildDynamicMajorProfile(name){
+    const clean=String(name||'').trim()||'该专业';
+    const isEngineering=/工程|技术|信息|材料|机械|自动化|能源|电气|土木|光学|光电|通信|电子/.test(clean);
+    const isMedical=/医学|临床|口腔|药学|护理|生物/.test(clean);
+    const isBusiness=/金融|经济|会计|管理|工商|财务|市场/.test(clean);
+    const isHumanities=/文学|语言|新闻|传播|历史|哲学|教育|法学|社会/.test(clean);
+    const base=isMedical?{
+      meta:['记忆、责任心、抗压、持续学习','医院、科研、公共卫生、相关产业','培养方案、附属资源、就业质量报告'],
+      learn:[['基础课程','生命科学、基础医学或相关理论'],['核心课程',clean+'核心课程与专业必修'],['方向选修','临床、科研、公共卫生或产业方向'],['实践项目','见习、实习、实验训练或毕业设计']],
+      careers:['医院或机构岗位','科研深造','健康产业','公共服务']
+    }:isBusiness?{
+      meta:['数学、表达、商业理解、数据分析','金融、咨询、企业职能、运营管理','培养方案、实习资源、就业质量报告'],
+      learn:[['基础课程','经济学、管理学、统计或会计基础'],['核心课程',clean+'核心理论与案例分析'],['方向选修','数据分析、行业专题、风险管理'],['实践项目','案例研究、竞赛、实习或毕业论文']],
+      careers:['企业职能','金融与咨询','数据运营','读研留学']
+    }:isHumanities?{
+      meta:['阅读、写作、表达、研究能力','教育、传媒、公职、研究深造','培养方案、学院官网、就业质量报告'],
+      learn:[['基础课程','学科导论、经典阅读、写作训练'],['核心课程',clean+'核心理论与方法'],['方向选修','专题研究、行业应用、跨学科方向'],['实践项目','调研、实习、作品或论文训练']],
+      careers:['教育与培训','内容与传媒','公职与事业单位','读研深造']
+    }:isEngineering?{
+      meta:['数学、物理、实验、工程实践','研发、设计、制造、检测、技术支持','培养方案、实验平台、就业质量报告'],
+      learn:[['基础课程','高等数学、大学物理、工程基础'],['核心课程',clean+'核心理论、系统设计与专业实验'],['方向选修','细分技术方向、行业应用、交叉方向'],['实践项目','课程设计、实验训练、竞赛或毕业设计']],
+      careers:['工程研发','技术支持','产品与测试','读研科研']
+    }:{
+      meta:['基础能力、专业兴趣、持续学习','行业岗位、升学深造、交叉发展','培养方案、官方资料、就业质量报告'],
+      learn:[['基础课程','学科基础课与专业导论'],['核心课程',clean+'核心课程与方法训练'],['方向选修','学校设置的细分方向和交叉课程'],['实践项目','实习、调研、项目或毕业设计']],
+      careers:['行业岗位','升学深造','交叉岗位','城市机会']
+    };
+    return {
+      keys:[clean],
+      name:clean,
+      desc:'围绕'+clean+'的课程体系、培养方向、实践要求和就业路径进行初步分析；若 RAG 暂无专门资料，先由模型按专业规律生成可参考内容，后续再用学校培养方案校正。',
+      meta:base.meta,
+      learn:base.learn,
+      careers:base.careers,
+      claims:[[clean+'一定好就业？','表达过宽'],[clean+'只看专业名就能判断？','缺少依据'],[clean+'不适合普通学生？','需要结合能力']],
+      questions:['该专业在目标学校具体学什么？','核心课程偏理论还是偏实践？','就业质量报告里对应岗位是什么？','是否适合自己的科目、兴趣和城市选择？']
+    };
+  }
+  function getMajorProfileClean(name){
+    const clean=String(name||'').trim();
+    return majorProfilesClean.find(profile=>profile.keys.some(key=>clean.includes(key)||key.includes(clean)))||buildDynamicMajorProfile(clean);
+  }
+  function renderMajorProfileClean(profile){
+    document.getElementById('majorTitle').textContent=profile.name;
+    document.getElementById('majorDesc').textContent=profile.desc;
+    window.currentMajorProfile=profile;
+    const relatedBtn=[...document.querySelectorAll('#major .major-hero button')].find(btn=>/加入对比|对比相近专业/.test(btn.textContent));
+    if(relatedBtn){
+      relatedBtn.textContent='对比相近专业';
+      relatedBtn.setAttribute('onclick','compareRelatedMajors()');
+    }
+    const metas=document.querySelectorAll('.major-meta .meta-card');
+    ['能力要求','常见方向','信息来源'].forEach((label,index)=>{if(metas[index])metas[index].innerHTML='<b>'+label+'</b>'+esc(profile.meta[index]||'');});
+    const learnGrid=document.querySelector('#major .learn-grid');
+    if(learnGrid)learnGrid.innerHTML=profile.learn.map(item=>'<div class="learn-card"><b>'+esc(item[0])+'</b><small>'+esc(item[1])+'</small></div>').join('');
+    const careerGrid=document.querySelector('#major .career-grid');
+    if(careerGrid)careerGrid.innerHTML=profile.careers.map(item=>'<div class="career-card">'+esc(item)+'</div>').join('');
+    const claimCard=document.querySelector('#major .major-body > div:nth-child(2) .card:first-child');
+    if(claimCard){const title=claimCard.querySelector('.card-title');claimCard.innerHTML=(title?title.outerHTML:'')+profile.claims.map(item=>'<div class="claim-check"><b>'+esc(item[0])+'</b><span class="tag-amber">'+esc(item[1])+'</span></div>').join('');}
+    const questionCard=document.querySelector('#major .major-body > div:nth-child(2) .card:nth-child(2)');
+    if(questionCard){
+      const title=questionCard.querySelector('.card-title');
+      questionCard.innerHTML=(title?title.outerHTML.replace('选择前建议追问','我还想重点核验'):'')+profile.questions.map(q=>'<label class="ask-item"><input class="ask-check" type="checkbox" value="'+esc(q)+'" onchange="syncMajorFocusQuestions()"><span>'+esc(q)+'</span></label>').join('')+'<div id="majorFocusHint" class="rmeta" style="margin-top:10px">勾选后会带入专业核验报告。</div>';
+    }
+    window.currentMajorFocusQuestions=[];
+    updateMajorComparison(profile);
+  }
+  function getRelatedMajorProfiles(profile){
+    const preferred={
+      '计算机科学与技术':['软件工程','人工智能'],
+      '软件工程':['计算机科学与技术','人工智能'],
+      '人工智能':['计算机科学与技术','软件工程'],
+      '法学':['汉语言文学','金融学'],
+      '临床医学':['生物医学工程','药学'],
+      '金融学':['经济学','会计学'],
+      '汉语言文学':['新闻传播学','法学'],
+      '电子信息类':['通信工程','计算机科学与技术']
+    };
+    const names=preferred[profile.name]||['计算机科学与技术','软件工程'];
+    return names.map(name=>getMajorProfileClean(name));
+  }
+  function getMajorCompareValue(profile,field){
+    const map={
+      '学习重点':profile.learn.map(item=>item[0]+'：'+item[1]).slice(0,2).join('；'),
+      '实践强度':profile.learn.some(item=>/实训|项目|实习|临床|实验|竞赛/.test(item[1]))?'较高，需要看学校平台':'中等，重点看培养方案',
+      '能力要求':profile.meta[0]||'结合个人科目和能力判断',
+      '常见去向':profile.careers.slice(0,3).join('、'),
+      '风险提醒':profile.claims.map(item=>item[0].replace('？','')).slice(0,2).join('；')
+    };
+    return map[field]||'结合 RAG 和模型综合判断';
+  }
+  function updateMajorComparison(profile){
+    const table=document.querySelector('#major table.cmp');
+    if(!table||!profile)return;
+    const related=getRelatedMajorProfiles(profile);
+    const columns=[profile].concat(related);
+    const fields=['学习重点','实践强度','能力要求','常见去向','风险提醒'];
+    table.innerHTML='<thead><tr><th>对比点</th>'+columns.map(item=>'<th>'+esc(item.name)+'</th>').join('')+'</tr></thead><tbody>'+fields.map(field=>'<tr><th>'+field+'</th>'+columns.map(item=>'<td>'+esc(getMajorCompareValue(item,field))+'</td>').join('')+'</tr>').join('')+'</tbody>';
+  }
+  function compareRelatedMajors(){
+    const name=(document.getElementById('majorTitle')||{}).textContent||'计算机科学与技术';
+    updateMajorComparison(window.currentMajorProfile||getMajorProfileClean(name));
+    const table=document.querySelector('#major table.cmp');
+    if(table)table.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  function getSelectedMajorQuestions(){
+    return [...document.querySelectorAll('#major .ask-check:checked')].map(input=>input.value.trim()).filter(Boolean);
+  }
+  function syncMajorFocusQuestions(){
+    window.currentMajorFocusQuestions=getSelectedMajorQuestions();
+    const hint=document.getElementById('majorFocusHint');
+    if(hint){
+      const count=window.currentMajorFocusQuestions.length;
+      hint.textContent=count?('已选择 '+count+' 个重点问题，会带入专业核验。'):'勾选后会带入专业核验报告。';
+    }
+  }
+  function verifyCurrentMajorClaim(){
+    const profile=window.currentMajorProfile||getMajorProfileClean((document.getElementById('majorTitle')||{}).textContent||'该专业');
+    const questions=getSelectedMajorQuestions();
+    const focusText=questions.length?('重点核验：'+questions.join('；')):'重点核验：课程体系、就业去向、培养方案与个人适配风险';
+    const claim=profile.name+' 专业是否适合我填报？请结合 RAG 知识库、官方培养方案、就业质量报告和模型综合判断。'+focusText;
+    const input=document.getElementById('claimInput');
+    if(input){
+      input.value=claim.slice(0,500);
+      updCount();
+    }
+    go('verify');
+  }
+  searchMajor=function(){
+    const input=document.getElementById('majorSearchInput');
+    const name=(input&&input.value.trim())||'计算机科学与技术';
+    renderMajorProfileClean(getMajorProfileClean(name));
+  };
+  renderCompare();
+  renderMajorProfileClean(getMajorProfileClean('计算机科学与技术'));
+  renderVerifyStats();
+  updateFavoriteCounts();
+  initFavoritePickerText();
+  renderVerifyHistory();
+</script>
+</body>
+</html>
+
