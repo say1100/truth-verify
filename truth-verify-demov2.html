@@ -488,32 +488,32 @@
         </div>
         <div class="hero-cardnav" id="heroCardNav">
           <div class="hero-cardnav-top">
-            <button class="hero-cardnav-menu" type="button" aria-label="展开核验能力" aria-expanded="false" onclick="toggleHeroCardNav()">
+            <button class="hero-cardnav-menu" type="button" aria-label="展开可信机制" aria-expanded="false" onclick="toggleHeroCardNav()">
               <span></span>
               <span></span>
             </button>
-            <div class="hero-cardnav-logo">核验能力</div>
+            <div class="hero-cardnav-logo">可信判断依据</div>
           </div>
           <div class="hero-cardnav-content" aria-hidden="true">
             <article class="hero-nav-card hero-nav-card-a">
-              <div class="hero-nav-label">4</div>
+              <div class="hero-nav-label">多模型判断</div>
               <div class="hero-nav-links">
-                <button type="button" onclick="go('verify')">独立核验模型 ↗</button>
-                <button type="button" onclick="go('compare')">官方 / 就业 / 校园 / 风险 ↗</button>
+                <button type="button" onclick="go('verify')">两个模型独立分析 ↗</button>
+                <button type="button" onclick="go('result')">对比一致与分歧 ↗</button>
               </div>
             </article>
             <article class="hero-nav-card hero-nav-card-b">
-              <div class="hero-nav-label">官方优先</div>
+              <div class="hero-nav-label">官方资料优先</div>
               <div class="hero-nav-links">
-                <button type="button" onclick="go('verify')">资料查证 ↗</button>
-                <button type="button" onclick="go('major')">先看章程与公开报告 ↗</button>
+                <button type="button" onclick="go('verify')">先查招生章程 ↗</button>
+                <button type="button" onclick="go('compare')">官网与公开报告 ↗</button>
               </div>
             </article>
             <article class="hero-nav-card hero-nav-card-c">
-              <div class="hero-nav-label">可追溯</div>
+              <div class="hero-nav-label">证据链追溯</div>
               <div class="hero-nav-links">
-                <button type="button" onclick="go('result')">每条结论有出处 ↗</button>
-                <button type="button" onclick="go('profile')">保留证据与分歧点 ↗</button>
+                <button type="button" onclick="go('result')">保留依据与风险点 ↗</button>
+                <button type="button" onclick="go('profile')">沉淀报告记录 ↗</button>
               </div>
             </article>
           </div>
@@ -522,7 +522,7 @@
 
       <div class="hero-right">
         <div class="mind">
-          <div class="mind-title">多模型核验思维导图</div>
+          <div class="mind-title">&#x6838;&#x9A8C;&#x94FE;&#x8DEF;</div>
           <div class="mm">
             <svg class="links" viewBox="0 0 480 400" preserveAspectRatio="none">
               <path d="M240 200 C 150 140, 90 90, 70 70"/>
@@ -532,13 +532,13 @@
               <path d="M240 200 C 240 130, 240 70, 240 45"/>
               <path d="M240 200 C 240 280, 240 350, 240 390"/>
             </svg>
-            <div class="node center">一条说法</div>
-            <div class="node n1">官方核验模型<small>资料查证</small></div>
-            <div class="node n2">就业分析模型<small>数据评估</small></div>
-            <div class="node n3">校园体验模型<small>宿舍 · 校区</small></div>
-            <div class="node n4">风险识别模型<small>夸大检测</small></div>
-            <div class="node n5">冲突与时效<small>版本差异</small></div>
-            <div class="node n6">可追溯报告<small>Truth Score</small></div>
+            <div class="node center">&#x4E00;&#x6761;&#x8BF4;&#x6CD5;</div>
+            <div class="node n1">&#x975E;&#x5B98;&#x65B9;&#x4FE1;&#x606F;<small>&#x7F51;&#x4F20; &middot; &#x7FA4;&#x804A;</small></div>
+            <div class="node n2">&#x5B98;&#x65B9;&#x6838;&#x9A8C;<small>&#x7AE0;&#x7A0B; &middot; &#x5B98;&#x7F51;</small></div>
+            <div class="node n3">RAG &#x77E5;&#x8BC6;&#x5E93;<small>&#x5B66;&#x751F;&#x53CD;&#x9988;</small></div>
+            <div class="node n4">&#x53CC;&#x6A21;&#x578B;&#x5224;&#x65AD;<small>&#x540C;&#x9898;&#x5206;&#x6790;</small></div>
+            <div class="node n5">&#x5206;&#x6B67;&#x8BC6;&#x522B;<small>&#x4E00;&#x81F4;&#x6027;&#x5BF9;&#x6BD4;</small></div>
+            <div class="node n6">&#x62A5;&#x544A;&#x8F93;&#x51FA;<small>&#x53EF;&#x4FE1;&#x5EA6; &middot; &#x98CE;&#x9669;</small></div>
           </div>
         </div>
       </div>
@@ -756,7 +756,6 @@
         <table class="cmp" id="compareTable">
           <thead id="compareHead"><tr><th>对比维度</th><th>南方理工大学</th><th>滨海科技大学</th><th>江城大学</th></tr></thead>
           <tbody id="compareBody">
-            <tr><th>2025 录取位次</th><td>全省 3,200 名左右</td><td>全省 5,000 名左右</td><td>全省 7,800 名左右</td></tr>
             <tr><th>优势专业</th><td>计算机、电子信息</td><td>人工智能、软件工程</td><td>法学、汉语言文学</td></tr>
             <tr><th>升学率</th><td>28% 较高</td><td>24% 中等</td><td>18% 中等偏低</td></tr>
             <tr><th>城市机会</th><td>广州 机会丰富</td><td>深圳 科技产业集中</td><td>武汉 机会中等</td></tr>
@@ -770,9 +769,9 @@
           <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 13 9 20 9"/><path d="M13 2l7 7v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg></span>
           快速结论
         </div>
-        <div class="quick-item">冲稳保定位清晰</div>
-        <div class="quick-item">城市机会差异较大</div>
-        <div class="quick-item">宿舍需确认具体校区</div>
+        <div class="quick-item">添加学校后生成对比结论</div>
+        <div class="quick-item">点击开始对比后读取 RAG 和模型分析</div>
+        <div class="quick-item">不会预置学校或展示假数据</div>
       </div>
     </div>
 
@@ -902,10 +901,10 @@
         <div><h2>个人中心</h2><p>集中查看保存的核验报告、学校与专业。</p></div>
       </div>
       <div class="stat-row">
-        <div class="stat-card"><div class="lab">核验报告</div><div class="num">6</div></div>
-        <div class="stat-card"><div class="lab">收藏学校</div><div class="num">4</div></div>
-        <div class="stat-card"><div class="lab">收藏专业</div><div class="num">3</div></div>
-        <div class="stat-card"><div class="lab">最近浏览</div><div class="num">12</div></div>
+        <div class="stat-card"><div class="lab">核验报告</div><div class="num">0</div></div>
+        <div class="stat-card"><div class="lab">收藏学校</div><div class="num">0</div></div>
+        <div class="stat-card"><div class="lab">收藏专业</div><div class="num">0</div></div>
+        <div class="stat-card"><div class="lab">最近浏览</div><div class="num">0</div></div>
       </div>
     </div>
 
@@ -929,10 +928,10 @@
             <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
             收藏夹
           </div>
-          <button class="fav-link" type="button" onclick="openFavoriteGroup('focus')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>重点关注 <span class="fav-count">3 ›</span></button>
-          <button class="fav-link" type="button" onclick="openFavoriteGroup('reach')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>冲刺学校 <span class="fav-count">4 ›</span></button>
-          <button class="fav-link" type="button" onclick="openFavoriteGroup('safe')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>稳妥选择 <span class="fav-count">2 ›</span></button>
-          <button class="fav-link" type="button" onclick="openFavoriteGroup('major')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>专业备选 <span class="fav-count">3 ›</span></button>
+          <button class="fav-link" type="button" onclick="openFavoriteGroup('focus')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>重点关注 <span class="fav-count">0 ›</span></button>
+          <button class="fav-link" type="button" onclick="openFavoriteGroup('reach')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>冲刺学校 <span class="fav-count">0 ›</span></button>
+          <button class="fav-link" type="button" onclick="openFavoriteGroup('safe')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>稳妥选择 <span class="fav-count">0 ›</span></button>
+          <button class="fav-link" type="button" onclick="openFavoriteGroup('major')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>专业备选 <span class="fav-count">0 ›</span></button>
         </div>
 
         <div class="card" style="padding:24px;margin-top:22px">
@@ -1192,19 +1191,22 @@
     updateRecognizedInfo(t.value);
   }
   function detectClaimClient(claim){
-    const schools=['深圳大学','中山大学','华南师范大学','华南理工大学','暨南大学','广州大学','广东工业大学','北京大学','清华大学','复旦大学','上海交通大学','浙江大学','武汉大学','四川大学'];
-    const matchedSchool=schools.find(name=>claim.includes(name))||(claim.includes('某大学')?'某大学':'未识别学校');
+    claim=String(claim||'').trim();
+    const schools=['\u6df1\u5733\u5927\u5b66','\u4e2d\u5c71\u5927\u5b66','\u534e\u5357\u5e08\u8303\u5927\u5b66','\u534e\u5357\u7406\u5de5\u5927\u5b66','\u66a8\u5357\u5927\u5b66','\u5e7f\u5dde\u5927\u5b66','\u5e7f\u4e1c\u5de5\u4e1a\u5927\u5b66','\u5317\u4eac\u5927\u5b66','\u6e05\u534e\u5927\u5b66','\u590d\u65e6\u5927\u5b66','\u4e0a\u6d77\u4ea4\u901a\u5927\u5b66','\u6d59\u6c5f\u5927\u5b66','\u6b66\u6c49\u5927\u5b66','\u56db\u5ddd\u5927\u5b66'];
+    const matchedSchool=schools.find(name=>claim.includes(name))||(claim.includes('\u67d0\u5927\u5b66')?'\u67d0\u5927\u5b66':'\u672a\u8bc6\u522b\u5b66\u6821');
     const topicRules=[
-      {label:'转专业',keywords:['转专业','换专业','跨学院']},
-      {label:'宿舍',keywords:['宿舍','寝室','住宿','四人间','独卫']},
-      {label:'交通/校区',keywords:['交通','地铁','校区','位置','通勤']},
-      {label:'就业',keywords:['就业','工作','薪资','大厂','实习']},
-      {label:'录取信息',keywords:['录取','位次','分数','专业组','招生']},
-      {label:'地理位置',keywords:['坐落','位于','城市','深圳','广州']},
-      {label:'学习升学',keywords:['保研','考研','升学','学习氛围']}
+      {label:'\u4e13\u4e1a\u5b9e\u529b',keywords:['\u738b\u724c\u4e13\u4e1a','\u4f18\u52bf\u4e13\u4e1a','\u5f3a\u52bf\u4e13\u4e1a','\u70ed\u95e8\u4e13\u4e1a','\u51b7\u95e8\u4e13\u4e1a','\u4e13\u4e1a\u5b9e\u529b','\u4e13\u4e1a\u6392\u540d','\u5b66\u79d1\u5b9e\u529b','\u5b66\u79d1\u8bc4\u4f30','\u4e13\u4e1a\u8bc4\u7ea7','\u662f\u4e0d\u662f\u738b\u724c','\u7b97\u4e0d\u7b97\u738b\u724c','\u662f\u4e0d\u662f\u5f3a\u9879','\u600e\u4e48\u6837','\u597d\u4e0d\u597d','A+','A\u7c7b','\u53cc\u4e00\u6d41','\u56fd\u5bb6\u7ea7\u4e00\u6d41','\u7279\u8272\u4e13\u4e1a','\u5149\u5b66\u5de5\u7a0b']},
+      {label:'\u8f6c\u4e13\u4e1a',keywords:['\u8f6c\u4e13\u4e1a','\u6362\u4e13\u4e1a','\u8de8\u5b66\u9662','\u8f6c\u5165','\u8f6c\u51fa','\u95e8\u69db','\u540d\u989d']},
+      {label:'\u5bbf\u820d',keywords:['\u5bbf\u820d','\u5bdd\u5ba4','\u4f4f\u5bbf','\u56db\u4eba\u95f4','\u516d\u4eba\u95f4','\u72ec\u536b','\u7a7a\u8c03','\u4e0a\u5e8a\u4e0b\u684c']},
+      {label:'\u4ea4\u901a/\u6821\u533a',keywords:['\u4ea4\u901a','\u5730\u94c1','\u6821\u533a','\u4f4d\u7f6e','\u901a\u52e4','\u79bb\u5e02\u533a','\u504f\u50fb','\u65b0\u6821\u533a','\u8001\u6821\u533a']},
+      {label:'\u5c31\u4e1a',keywords:['\u5c31\u4e1a','\u5de5\u4f5c','\u85aa\u8d44','\u5927\u5382','\u5b9e\u4e60','\u5c31\u4e1a\u7387','\u6bd5\u4e1a\u53bb\u5411','\u8003\u516c','\u8fdb\u5382','\u8fdb\u4f53\u5236']},
+      {label:'\u5f55\u53d6\u4fe1\u606f',keywords:['\u5f55\u53d6','\u4f4d\u6b21','\u5206\u6570','\u6295\u6863\u7ebf','\u4e13\u4e1a\u7ec4','\u62db\u751f','\u6269\u62db','\u7f29\u62db','\u6700\u4f4e\u5206','\u6392\u4f4d']},
+      {label:'\u5730\u7406\u4f4d\u7f6e',keywords:['\u5750\u843d','\u4f4d\u4e8e','\u5730\u5740','\u57ce\u5e02','\u6df1\u5733','\u5e7f\u5dde','\u5317\u4eac','\u4e0a\u6d77','\u6b66\u6c49','\u6210\u90fd']},
+      {label:'\u5b66\u4e60\u5347\u5b66',keywords:['\u4fdd\u7814','\u8003\u7814','\u5347\u5b66','\u5b66\u4e60\u6c1b\u56f4','\u7ee9\u70b9','\u8bfe\u7a0b','\u7ade\u8d5b','\u6df1\u9020']},
+      {label:'\u751f\u6d3b\u73af\u5883',keywords:['\u73af\u5883','\u6821\u56ed','\u98df\u5802','\u751f\u6d3b','\u996d\u5802','\u597d\u5403','\u4fbf\u5229','\u793e\u56e2','\u6d3b\u52a8']}
     ];
     const topics=topicRules.filter(rule=>rule.keywords.some(word=>claim.includes(word))).map(rule=>rule.label);
-    return {school:matchedSchool,topics:topics.length?topics:['待识别话题']};
+    return {school:matchedSchool,topics:topics.length?topics:['\u5f85\u8bc6\u522b\u8bdd\u9898']};
   }
   function updateRecognizedInfo(claim){
     const box=document.getElementById('recognizedInfo');
@@ -1543,16 +1545,15 @@
     if(btn){
       btn.classList.toggle('open',open);
       btn.setAttribute('aria-expanded',String(open));
-      btn.setAttribute('aria-label',open?'收起核验能力':'展开核验能力');
+      btn.setAttribute('aria-label',open?'收起可信机制':'展开可信机制');
     }
     if(content)content.setAttribute('aria-hidden',String(!open));
   }
-  const selectedSchools=['深圳大学','中山大学','华南师范大学'];
+  const selectedSchools=[];
   let compareApiRows=null;
   let compareApiSummary=[];
   const compareRows={
     '综合概览':[
-      ['2025 录取位次',['全省 3,200 名左右','全省 5,000 名左右','全省 7,800 名左右','待补充']],
       ['优势专业',['计算机、电子信息','人工智能、软件工程','法学、汉语言文学','待补充']],
       ['升学率',['28% 较高','24% 中等','18% 中等偏低','待补充']],
       ['城市机会',['广州 机会丰富','深圳 科技产业集中','武汉 机会中等','待补充']],
@@ -1619,6 +1620,22 @@
     }
     const head=document.getElementById('compareHead');
     const body=document.getElementById('compareBody');
+    if(!selectedSchools.length){
+      if(head)head.innerHTML='<tr><th>对比维度</th><th>等待添加学校</th></tr>';
+      if(body)body.innerHTML='<tr><th>当前状态</th><td>请先在上方输入大学名称，添加 2-4 所学校后再点击“开始对比”。</td></tr><tr><th>数据来源</th><td>开始对比后会调用 /api/school-compare，结合 Supabase RAG 和模型分析返回结果。</td></tr><tr><th>显示规则</th><td>未开始对比前不展示默认学校、不展示静态示例数据。</td></tr>';
+      const fit=document.getElementById('fitGrid');
+      if(fit)fit.innerHTML='<p><b>提示：</b>这里会在对比完成后显示每所学校的适配建议。</p>';
+      updateSchoolCount();
+      return;
+    }
+    if(!compareApiRows){
+      if(head)head.innerHTML='<tr><th>对比维度</th>'+selectedSchools.map(s=>`<th>${esc(s)}</th>`).join('')+'</tr>';
+      if(body)body.innerHTML='<tr><th>等待开始</th>'+selectedSchools.map(()=>'<td>点击“开始对比”后生成该校数据。</td>').join('')+'</tr>';
+      const fit=document.getElementById('fitGrid');
+      if(fit)fit.innerHTML=selectedSchools.map(s=>`<p><b>${esc(s)}：</b>等待对比生成，暂不展示预置结论。</p>`).join('');
+      updateSchoolCount();
+      return;
+    }
     if(head)head.innerHTML='<tr><th>对比维度</th>'+selectedSchools.map(s=>`<th>${esc(s)}</th>`).join('')+'</tr>';
     const rows=(compareApiRows&&compareApiRows[tab])||compareRows[tab]||compareRows['综合概览'];
     if(body)body.innerHTML=rows.map(row=>'<tr><th>'+esc(row[0])+'</th>'+selectedSchools.map((_,i)=>`<td>${esc(row[1][i]||'待补充')}</td>`).join('')+'</tr>').join('');
@@ -1628,30 +1645,32 @@
   }
   function compareFallbackCell(schoolName,field){
     const strength={
-      '深圳大学':'模型综合：计算机、电子信息、设计和经管较受关注',
-      '中山大学':'模型综合：医学、经管、法学、计算机等综合实力强',
-      '华南师范大学':'模型综合：师范教育、心理学、计算机和文科方向'
+      '深圳大学':'计算机、电子信息、设计和经管较受关注',
+      '中山大学':'医学、经管、法学、计算机等综合实力强',
+      '华南师范大学':'师范教育、心理学、计算机和文科方向'
     };
     const city={
-      '深圳大学':'模型综合：深圳科技产业集中，实习就业机会强',
-      '中山大学':'模型综合：广州高校资源密集，综合机会丰富',
-      '华南师范大学':'模型综合：广州教育资源集中，师范方向优势明显'
+      '深圳大学':'深圳科技产业集中，实习就业机会强',
+      '中山大学':'广州高校资源密集，综合机会丰富',
+      '华南师范大学':'广州教育资源集中，师范方向优势明显'
     };
     const map={
-      '2025 录取位次':'模型综合：需按省份查近三年专业组位次',
-      '优势专业':strength[schoolName]||'模型综合：结合学科实力、培养方案和就业报告判断',
-      '升学率':'模型综合：看就业质量报告、保研率和考研去向',
-      '城市机会':city[schoolName]||'模型综合：看城市产业、实习半径和校友资源',
-      '住宿条件':'模型综合：需按具体校区核验宿舍新旧和配置',
-      '交通便利':'模型综合：看校区位置、地铁距离和通勤成本',
-      '校园环境':'模型综合：看校区新旧、面积和生活配套',
-      '学习氛围':'模型综合：看学院竞争强度、升学目标和专业差异',
-      '风险提示':'模型综合：需用官方数据和学生反馈交叉验证'
+      '2025 录取位次':'需按省份查近三年专业组位次',
+      '优势专业':strength[schoolName]||'结合学科实力、培养方案和就业报告判断',
+      '升学率':'看就业质量报告、保研率和考研去向',
+      '城市机会':city[schoolName]||'看城市产业、实习半径和校友资源',
+      '住宿条件':'需按具体校区核验宿舍新旧和配置',
+      '交通便利':'看校区位置、地铁距离和通勤成本',
+      '校园环境':'看校区新旧、面积和生活配套',
+      '学习氛围':'看学院竞争强度、升学目标和专业差异',
+      '风险提示':'需用官方数据和学生反馈交叉验证'
     };
-    return map[field]||'模型综合：需结合 RAG 和官方资料继续核验';
+    return map[field]||'需结合 RAG 和官方资料继续核验';
   }
   function normalizeCompareCell(value,schoolName,field){
-    const text=String(value||'').trim();
+    const text=String(value||'')
+      .replace(/^(模型综合|RAG|学生反馈|官方依据|官方资料)\s*[：:]\s*/,'')
+      .trim();
     if(!text||/待接入|暂无|需接入|待补充|待确认|暂无足够/.test(text))return compareFallbackCell(schoolName,field);
     if(/^(是|有|不是|没有|否|是\s*\/\s*是|有\s*\/\s*有|不是\s*\/\s*不是)$/.test(text))return compareFallbackCell(schoolName,field);
     if(text.length<=6)return compareFallbackCell(schoolName,field);
@@ -1663,7 +1682,7 @@
     return normalizeCompareCell(value,name,field);
   }
   function buildCompareRowsFromApi(schools){
-    const fields=['2025 录取位次','优势专业','升学率','城市机会','住宿条件','交通便利','校园环境','学习氛围','风险提示'];
+    const fields=['优势专业','升学率','城市机会','住宿条件','交通便利','校园环境','学习氛围','风险提示'];
     const rows=fields.map(field=>[
       field,
       selectedSchools.map(name=>{
@@ -1678,9 +1697,7 @@
         ['升学率',selectedSchools.map(name=>getCompareCell(schools,name,'升学率'))],
         ['风险提示',selectedSchools.map(name=>getCompareCell(schools,name,'风险提示'))]
       ],
-      '录取位次':[
-        ['2025 录取位次',selectedSchools.map(name=>getCompareCell(schools,name,'2025 录取位次'))]
-      ],
+      '录取位次':[],
       '专业实力':[
         ['优势专业',selectedSchools.map(name=>getCompareCell(schools,name,'优势专业'))]
       ],
@@ -1716,6 +1733,13 @@
     renderCompare(active?active.textContent.trim():'综合概览');
   }
   async function startCompare(){
+    if(selectedSchools.length<2){
+      document.querySelectorAll('.quick-item').forEach((item,i)=>{
+        item.textContent=['请至少添加 2 所学校','添加后再点击开始对比','当前不会展示示例假数据'][i]||item.textContent;
+      });
+      renderCompare('综合概览');
+      return;
+    }
     const firstTab=document.querySelector('.cmp-tab');
     if(firstTab){
       firstTab.parentElement.querySelectorAll('.cmp-tab').forEach(t=>t.classList.remove('active'));
@@ -1735,8 +1759,10 @@
         });
       }catch(err){
         console.warn('school compare api unavailable, using static rows',err);
+        compareApiRows=null;
+        compareApiSummary=[];
         document.querySelectorAll('.quick-item').forEach((item,i)=>{
-          item.textContent=['接口暂不可用，已显示本地静态数据','请确认后端是否启动','Network 中查看 /api/school-compare'][i]||item.textContent;
+          item.textContent=['接口暂不可用，未展示静态假数据','请确认后端是否启动','Network 中查看 /api/school-compare'][i]||item.textContent;
         });
       }
     }
@@ -1904,6 +1930,11 @@
   updateFavoriteCounts();
   initFavoritePickerText();
   renderVerifyHistory();
+  const claimInputEl=document.getElementById('claimInput');
+  if(claimInputEl){
+    ['input','keyup','change','paste'].forEach(evt=>claimInputEl.addEventListener(evt,()=>setTimeout(updCount,0)));
+    updCount();
+  }
 </script>
 </body>
 </html>
