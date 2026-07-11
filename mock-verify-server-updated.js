@@ -12,6 +12,9 @@ const GONKA_MODEL_A = process.env.GONKA_MODEL_A || "MiniMaxAI/MiniMax-M2.7";
 const GONKA_MODEL_B = process.env.GONKA_MODEL_B || "moonshotai/Kimi-K2.6";
 const GONKA_MODEL_A_NAME = process.env.GONKA_MODEL_A_NAME || "MiniMax-M2.7";
 const GONKA_MODEL_B_NAME = process.env.GONKA_MODEL_B_NAME || "Kimi-K2.6";
+const MODEL_TIMEOUT_MS = Number(process.env.MODEL_TIMEOUT_MS || 15000);
+const COMPARE_MODEL_TIMEOUT_MS = Number(process.env.COMPARE_MODEL_TIMEOUT_MS || 18000);
+const ENABLE_DEMO_CACHE = process.env.ENABLE_DEMO_CACHE !== "false";
 const SUPABASE_URL = process.env.SUPABASE_URL || "";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const supabase = SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
@@ -49,6 +52,100 @@ function sendJson(res, statusCode, data) {
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
   });
   res.end(body);
+}
+
+function nowMs() {
+  return Date.now();
+}
+
+function logTrace(traceId, step, startedAt, extra = {}) {
+  const ms = nowMs() - startedAt;
+  console.log(JSON.stringify({ trace_id: traceId, step, ms, ...extra }));
+  return nowMs();
+}
+
+function createTimeoutResult(model, displayName, timeoutMs) {
+  return {
+    model,
+    display_name: displayName,
+    ok: false,
+    verdict: "模型超时",
+    confidence: 0,
+    reason: `${displayName} 超过 ${Math.round(timeoutMs / 1000)} 秒未返回，已启用降级结果。`,
+    risk_tags: ["模型超时"],
+    missing_evidence: ["稍后重试或改用缓存示例"],
+    timed_out: true,
+  };
+}
+
+function withTimeout(promise, timeoutMs, fallbackFactory) {
+  return Promise.race([
+    promise,
+    new Promise((resolve) => {
+      setTimeout(() => resolve(fallbackFactory()), timeoutMs);
+    }),
+  ]);
+}
+
+function normalizeDemoText(text) {
+  return String(text || "").replace(/\s+/g, "").toLowerCase();
+}
+
+const demoVerifyCases = [
+  {
+    match: ["转专业", "很容易"],
+    report: {
+      claim: "某大学转专业很容易，宿舍也不错，就业基本不用担心。",
+      status: "completed",
+      truth_score: 72,
+      verdict: "部分可信",
+      summary: "该说法有部分依据，但“很容易”“不用担心”属于夸大表达，需要确认学院、校区和年份范围。",
+      risk_tags: ["片面表达", "需确认范围", "就业结论过宽"],
+      models: [
+        { role: "官方核验", verdict: "部分支持", confidence: 0.78, reason: "转专业通常存在申请通道，但具体门槛取决于学院名额、绩点和考核。", evidence_ids: [] },
+        { role: "风险识别", verdict: "发现夸大", confidence: 0.86, reason: "“很容易”“不用担心”是绝对化表达，不能直接作为填报依据。", evidence_ids: [] },
+      ],
+      evidence: [],
+      conflicts: ["不同学院和年份的转专业政策可能不同。"],
+      limitations: ["该缓存结果用于 Demo 快速展示，真实提交仍应结合官方章程和就业质量报告。"],
+      next_questions: ["目标学院近两年转专业通过率是多少？", "该专业对应哪个校区？", "就业数据是否细分到具体专业？"],
+      recognized: { school: "未识别", topics: ["转专业", "宿舍住宿", "就业发展"] },
+      source: "demo_cache",
+    },
+  },
+  {
+    match: ["计算机", "好就业"],
+    report: {
+      claim: "计算机专业一定好就业？",
+      status: "completed",
+      truth_score: 70,
+      verdict: "存疑",
+      summary: "计算机就业受学校层次、城市、个人项目能力和行业周期影响，“一定好就业”过于绝对。",
+      risk_tags: ["绝对化表述", "过度简化", "缺少学校差异"],
+      models: [
+        { role: "就业分析", verdict: "谨慎采信", confidence: 0.72, reason: "就业机会多不等于所有学生都好就业，需要看培养质量和个人能力。", evidence_ids: [] },
+        { role: "风险识别", verdict: "表达过宽", confidence: 0.82, reason: "“一定”忽略学校、方向和市场周期差异。", evidence_ids: [] },
+      ],
+      evidence: [],
+      conflicts: ["行业热度与个体就业结果之间不能直接等同。"],
+      limitations: ["需要目标学校就业质量报告和专业去向数据。"],
+      next_questions: ["目标学校计算机专业就业去向如何？", "实习资源集中在哪些城市？"],
+      recognized: { school: "未识别", topics: ["就业发展"] },
+      source: "demo_cache",
+    },
+  },
+];
+
+function getDemoVerifyReport(claim) {
+  if (!ENABLE_DEMO_CACHE) return null;
+  const normalized = normalizeDemoText(claim);
+  const hit = demoVerifyCases.find((item) => item.match.every((word) => normalized.includes(normalizeDemoText(word))));
+  if (!hit) return null;
+  return {
+    ...hit.report,
+    claim,
+    performance: { cache_hit: true, mode: "demo_cache" },
+  };
 }
 
 function sendText(res, statusCode, content, contentType) {
@@ -425,7 +522,11 @@ async function saveVerifyReport(report, requestBody = {}) {
 }
 
 async function handleVerify(req, res) {
+  const traceId = `verify-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  let stepStarted = nowMs();
+  const totalStarted = stepStarted;
   const body = await readJsonBody(req);
+  stepStarted = logTrace(traceId, "read_body", stepStarted);
   const claim = typeof body.claim === "string" ? body.claim.trim() : "";
   if (!claim) {
     sendJson(res, 400, { status: "error", message: "claim is required" });
@@ -433,18 +534,62 @@ async function handleVerify(req, res) {
   }
 
   try {
+    const cachedReport = getDemoVerifyReport(claim);
+    if (cachedReport) {
+      cachedReport.performance = {
+        ...cachedReport.performance,
+        trace_id: traceId,
+        total_ms: nowMs() - totalStarted,
+      };
+      sendJson(res, 200, cachedReport);
+      console.log(JSON.stringify({ trace_id: traceId, step: "demo_cache_response", ms: nowMs() - totalStarted }));
+      return;
+    }
     const ragContext = await retrieveRagContext(claim);
+    stepStarted = logTrace(traceId, "rag_context", stepStarted, {
+      evidence_count: ragContext?.evidence?.length || 0,
+      school: ragContext?.school?.name || "",
+    });
     const modelResults = await Promise.all([
-      callGonkaModel(GONKA_MODEL_A, GONKA_MODEL_A_NAME, claim, ragContext),
-      callGonkaModel(GONKA_MODEL_B, GONKA_MODEL_B_NAME, claim, ragContext),
+      withTimeout(
+        callGonkaModel(GONKA_MODEL_A, GONKA_MODEL_A_NAME, claim, ragContext),
+        MODEL_TIMEOUT_MS,
+        () => createTimeoutResult(GONKA_MODEL_A, GONKA_MODEL_A_NAME, MODEL_TIMEOUT_MS)
+      ),
+      withTimeout(
+        callGonkaModel(GONKA_MODEL_B, GONKA_MODEL_B_NAME, claim, ragContext),
+        MODEL_TIMEOUT_MS,
+        () => createTimeoutResult(GONKA_MODEL_B, GONKA_MODEL_B_NAME, MODEL_TIMEOUT_MS)
+      ),
     ]);
+    stepStarted = logTrace(traceId, "models", stepStarted, {
+      timeout_count: modelResults.filter((item) => item.timed_out).length,
+      ok_count: modelResults.filter((item) => item.ok).length,
+    });
     const report = mergeModelResults(claim, modelResults, ragContext);
-    const saveResult = await saveVerifyReport(report, body);
-    report.report_id = saveResult.id || null;
-    report.cloud_saved = saveResult.saved;
-    if (!saveResult.saved) report.cloud_save_error = saveResult.error;
+    report.performance = {
+      trace_id: traceId,
+      total_ms: nowMs() - totalStarted,
+      model_timeout_ms: MODEL_TIMEOUT_MS,
+      timeout_count: modelResults.filter((item) => item.timed_out).length,
+    };
     sendJson(res, 200, report);
+    logTrace(traceId, "response_sent", totalStarted, { status: 200 });
+    saveVerifyReport(report, body)
+      .then((saveResult) => {
+        console.log(JSON.stringify({
+          trace_id: traceId,
+          step: "save_report_async",
+          saved: saveResult.saved,
+          report_id: saveResult.id || null,
+          error: saveResult.error || "",
+        }));
+      })
+      .catch((error) => {
+        console.warn(JSON.stringify({ trace_id: traceId, step: "save_report_async_error", error: error.message }));
+      });
   } catch (error) {
+    console.warn(JSON.stringify({ trace_id: traceId, step: "verify_error", ms: nowMs() - totalStarted, error: error.message }));
     sendJson(res, 500, { status: "error", message: error.message || "verify failed" });
   }
 }
@@ -707,7 +852,11 @@ async function buildSchoolCompareItem(name) {
 }
 
 async function handleSchoolCompare(req, res) {
+  const traceId = `compare-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  let stepStarted = nowMs();
+  const totalStarted = stepStarted;
   const body = await readJsonBody(req);
+  stepStarted = logTrace(traceId, "read_body", stepStarted);
   const schools = Array.isArray(body.schools) ? body.schools.filter(Boolean) : [];
   if (!schools.length) {
     sendJson(res, 400, { status: "error", message: "schools is required" });
@@ -718,15 +867,25 @@ async function handleSchoolCompare(req, res) {
     return;
   }
 
-  const ragSchools = [];
-  for (const school of schools) {
-    ragSchools.push(await buildSchoolCompareItem(school));
-  }
+  const ragSchools = await Promise.all(schools.map((school) => buildSchoolCompareItem(school)));
+  stepStarted = logTrace(traceId, "rag_schools", stepStarted, { school_count: ragSchools.length });
 
   const modelResults = await Promise.all([
-    callCompareModel(GONKA_MODEL_A, GONKA_MODEL_A_NAME, ragSchools),
-    callCompareModel(GONKA_MODEL_B, GONKA_MODEL_B_NAME, ragSchools),
+    withTimeout(
+      callCompareModel(GONKA_MODEL_A, GONKA_MODEL_A_NAME, ragSchools),
+      COMPARE_MODEL_TIMEOUT_MS,
+      () => ({ ok: false, model: GONKA_MODEL_A, display_name: GONKA_MODEL_A_NAME, error: `timeout after ${COMPARE_MODEL_TIMEOUT_MS}ms`, timed_out: true })
+    ),
+    withTimeout(
+      callCompareModel(GONKA_MODEL_B, GONKA_MODEL_B_NAME, ragSchools),
+      COMPARE_MODEL_TIMEOUT_MS,
+      () => ({ ok: false, model: GONKA_MODEL_B, display_name: GONKA_MODEL_B_NAME, error: `timeout after ${COMPARE_MODEL_TIMEOUT_MS}ms`, timed_out: true })
+    ),
   ]);
+  stepStarted = logTrace(traceId, "models", stepStarted, {
+    timeout_count: modelResults.filter((item) => item.timed_out).length,
+    ok_count: modelResults.filter((item) => item.ok).length,
+  });
   const mergedSchools = applyCompareModelResults(ragSchools, modelResults);
   const modelConclusions = modelResults
     .filter((item) => item.ok)
@@ -735,6 +894,12 @@ async function handleSchoolCompare(req, res) {
   sendJson(res, 200, {
     status: "completed",
     source: "supabase_rag_plus_two_models",
+    performance: {
+      trace_id: traceId,
+      total_ms: nowMs() - totalStarted,
+      model_timeout_ms: COMPARE_MODEL_TIMEOUT_MS,
+      timeout_count: modelResults.filter((item) => item.timed_out).length,
+    },
     schools: mergedSchools,
     model_results: modelResults.map((item) => ({
       model: item.display_name || item.model,
@@ -749,6 +914,7 @@ async function handleSchoolCompare(req, res) {
           "??????????????????",
         ],
   });
+  logTrace(traceId, "response_sent", totalStarted, { status: 200 });
 }
 
 function normalizeVerifyReportRow(row) {
